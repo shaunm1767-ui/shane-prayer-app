@@ -1,0 +1,56 @@
+Perfect — here’s your full exam-style snail pace script for Windows PowerShell, from absolute zero to fully backed up on GitHub. Copy-paste each block one at a time, and you’ll have everything staged, committed, deployed, and pushed safely. 🐌💾
+
+0️⃣ Navigate to your project folder
+cd C:\Users\Shaun\Desktop\shane-prayer-app
+
+Check you’re in the right folder:
+
+pwd
+ls
+You should see all your project files (build/, src/, .firebaserc, etc.)
+1️⃣ Initialize Git (only if not done)
+git init
+Creates a .git folder so Git can track changes.
+2️⃣ Stage all files for commit
+git add -A
+
+Check staging:
+
+git status
+You should see all files listed under “Changes to be committed”
+3️⃣ Commit your snapshot
+git commit -m "Initial commit: Firebase setup + hosting live"
+
+Verify commit:
+
+git log --oneline
+You should see one commit at the top
+4️⃣ Add your GitHub remote
+
+Remove old remote (if any):
+
+git remote remove origin
+
+Add the correct remote:
+
+git remote add origin https://github.com/shaunm1767-ui/shane-prayer-app.git
+
+Verify remote:
+
+git remote -v
+Should show your GitHub URL for origin
+5️⃣ Push your commit to GitHub
+git push -u origin master
+Uploads all files and commits to GitHub
+-u sets this branch as default for future pushes
+6️⃣ Optional Future Workflow (Snail Pace)
+
+Whenever you make a small change:
+
+git add .
+git commit -m "Describe the change"
+git push
+One logical change per commit → keeps your repo clean
+You can always roll back to previous commits if needed
+
+If you follow this step by step, your Prayer App will be fully backed up locally, deployed on Firebase, and mirrored on GitHub — a perfect safe checkpoint. ✅

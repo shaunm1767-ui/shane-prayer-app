@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shane Satsang Dashboard</title>
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(180deg,#dbeefe,#c7e2f5);
+}
+header{
+    background:#b3d7f0;
+    text-align:center;
+    padding:15px;
+    font-size:22px;
+    font-weight:bold;
+}
+.container{display:flex;height:calc(100vh - 60px);}
+.sidebar{width:220px;background:#a7cfe8;padding:10px;}
+.sidebar button{
+    width:100%;padding:10px;margin-bottom:6px;
+    border:none;font-weight:bold;cursor:pointer;
+}
+.sidebar button.active{background:#f1c45b;}
+.content{flex:1;padding:20px;overflow:auto;}
+.section{
+    background:rgba(255,255,255,0.8);
+    padding:15px;margin-bottom:20px;border-radius:12px;
+}
+img{
+    max-width:260px;
+    display:block;
+    margin:15px auto;
+    border-radius:12px;
+}
+audio,video,select{width:100%;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<header>🌅 Shane Satsang – Daily Flow</header>
+
+<div class="container">
+<div class="sidebar" id="days"></div>
+
+<div class="content">
+<h2 id="title"></h2>
+
+<div class="section">
+<h3>🌞 Daily Surya Practice</h3>
+<ol>
+<li>Wake at sunrise</li>
+<li>Bath</li>
+<li>Offer water to Surya</li>
+<li>Gayatri mantra</li>
+<li>Meditate on health & vitality</li>
+</ol>
+</div>
+
+<div class="section">
+<h3 id="deity"></h3>
+<img id="image">
+<audio id="mainAudio" controls></audio>
+</div>
+
+<div class="section">
+<h3>🎧 Shane Bhajans Library</h3>
+<select id="library"></select>
+<audio id="player" controls></audio>
+</div>
+
+</div>
+</div>
+
+<script>
+// ======= DAYS & DEITIES =======
+const days = [
+{day:"Sunday", deity:"Surya", img:"Surya.jpg"},
+{day:"Monday", deity:"Shiva", img:"shiva.jpg"},
+{day:"Tuesday", deity:"Hanuman", img:"Hanuman.jpg"},
+{day:"Wednesday", deity:"Ganesha", img:"GANESHA.JPG"},
+{day:"Thursday", deity:"Saraswati", img:"Saraswati.jpg"},
+{day:"Friday", deity:"Lakshmi", img:"Lakshmi.jpg"},
+{day:"Saturday", deity:"Shani", img:"shani.jpg"}
+];
+
+// ======= SIDEBAR =======
+const today = new Date().getDay();
+const sidebar = document.getElementById("days");
+
+days.forEach((d,i)=>{
+    const btn=document.createElement("button");
+    btn.textContent=d.day;
+    if(i===today) btn.classList.add("active");
+    btn.onclick=()=>loadDay(i);
+    sidebar.appendChild(btn);
+});
+
+// ======= LOAD DAY =======
+function loadDay(i){
+    let d=days[i];
+    document.getElementById("title").textContent =
+        "Today is "+d.day+" – Focus on "+d.deity;
+    document.getElementById("deity").textContent=d.deity;
+    document.getElementById("image").src="media/gods/"+d.img;
+
+    let audio=document.getElementById("mainAudio");
+    if(d.audio){
+        audio.src="media/audio/"+d.audio;
+        audio.style.display="block";
+    } else {
+        audio.style.display="none";
+    }
+}
+
+// ======= MEDIA LIBRARY =======
+const media=[
+"06 Mujko Pyaari raam.mp3",
+"jai ganesh 8 names.mp3",
+"kabi pyaase.mp3",
+"om nmha sivaya.mp3",
+"siya raam.mp3",
+"swarg se sundar.mp3",
+"shiva.mp3",
+"hanuman.mp4",
+"mahamantra.mp4",
+"shane_bhajan.mp4",
+"shane_satsang.mp4",
+"shane_ganesh_chalisa.mp3",
+"shane_ganesh_openingprayer.mp3",
+"shane_durga_chalisa.mp3",
+"shane_Jaiambegauri_arthi.mp3",
+"shane_luxmi_chalisa.mp3",
+"shane_luxmi_arthi.mp3",
+"shane_saraswathie_chalisa.mp3",
+"shane_saraswathi_arthi.mp3",
+"shane_gurucharanan_bhajan.mp3",
+"shane_mother_bhajan.mp3",
+"shane_krishna_bhajan.mp3",
+"shane_ram_bhajan.mp3",
+"shane_saraswathi_bhajan.mp3",
+"shane_hanuman_bhajan.mp3",
+"shane_mother_bhajan1.mp3",
+"shane_vishnu_bhajan.mp3",
+"shane_mother_bhajan3.mp3",
+"shane_jaishreeram_bahajan.mp3",
+"shane_shiv_arthi.mp3",
+"shane_hanuman_arthi.mp3",
+"shane_uniserval_arthi.mp3",
+"shane_krishna_bhajan4.mp3",
+"shane_satsang1_bhajan.mp3",
+"shane_mother_bahjan5.mp3",
+"shane_shiva_bhajan.mp3",
+"shane_krishna_bahajan7.mp3",
+"shane_discourse.mp3",
+"shane_discourse1.mp3",
+"shane_discourse2.mp3",
+"shane_discourse3.mp3",
+"shane_discourse4.mp3",
+"shane_discourse5.mp3",
+"shane_discourse6.mp3",
+"shane_discourse7.mp3"
+];
+
+const library=document.getElementById("library");
+const player=document.getElementById("player");
+
+media.forEach(file=>{
+    let opt=document.createElement("option");
+    opt.value="media/audio/"+file;
+    opt.textContent=file;
+    library.appendChild(opt);
+});
+
+library.onchange=()=>{ player.src=library.value; player.play(); };
+
+// ======= AUTO PLAY RAM BHAJAN ON LOAD =======
+window.addEventListener('DOMContentLoaded',()=>{
+    const introAudio = "media/audio/shane_ram_bhajan.mp3";
+    const mainAudio = document.getElementById("mainAudio");
+
+    mainAudio.src = introAudio;
+    mainAudio.play().catch(e=>console.log("Autoplay blocked: ", e));
+
+    // When intro ends, load today
+    mainAudio.onended = ()=>{
+        loadDay(today);
+    };
+});
+</script>
+
+</body>
+</html>

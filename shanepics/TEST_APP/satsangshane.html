@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shane Satsang Dashboard</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(180deg,#dbeefe,#c7e2f5);
+}
+header{
+    background:#b3d7f0;
+    text-align:center;
+    padding:15px;
+    font-size:22px;
+    font-weight:bold;
+}
+.container{display:flex;height:calc(100vh - 60px);}
+.sidebar{width:220px;background:#a7cfe8;padding:10px;}
+.sidebar button{
+    width:100%;padding:10px;margin-bottom:6px;
+    border:none;font-weight:bold;cursor:pointer;
+}
+.sidebar button.active{background:#f1c45b;}
+.content{flex:1;padding:20px;overflow:auto;}
+.section{
+    background:rgba(255,255,255,0.8);
+    padding:15px;margin-bottom:20px;border-radius:12px;
+}
+img{
+    max-width:260px;
+    display:block;
+    margin:15px auto;
+    border-radius:12px;
+}
+audio,select{width:100%;margin-top:10px;}
+</style>
+</head>
+
+<body>
+
+<header>🌅 Shane Satsang – Daily Flow</header>
+
+<div class="container">
+
+<div class="sidebar" id="days"></div>
+
+<div class="content">
+
+<h2 id="title"></h2>
+
+<div class="section">
+<h3>🌞 Daily Surya Practice</h3>
+<ol>
+<li>Wake at sunrise</li>
+<li>Bath</li>
+<li>Offer water to Surya</li>
+<li>Gayatri mantra</li>
+<li>Meditate on health & vitality</li>
+</ol>
+</div>
+
+<div class="section">
+<h3 id="deity"></h3>
+<img id="image">
+<audio id="mainAudio" controls style="display:none"></audio>
+</div>
+
+<div class="section">
+<h3>🎧 Shane Bhajans Library</h3>
+<select id="library"></select>
+<audio id="player" controls></audio>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const days = [
+{day:"Sunday", deity:"Surya", img:"Surya.jpg"},
+{day:"Monday", deity:"Shiva", img:"shiva.jpg", audio:"shiva.mp3"},
+{day:"Tuesday", deity:"Hanuman", img:"Hanuman.jpg"}, 
+{day:"Wednesday", deity:"Ganesha", img:"GANESHA.JPG", audio:"jai ganesh 8 names.mp3"},
+{day:"Thursday", deity:"Saraswati", img:"Saraswati.jpg"},
+{day:"Friday", deity:"Lakshmi", img:"Lakshmi.jpg"},
+{day:"Saturday", deity:"Shani", img:"shani.jpg"}
+];
+
+const today = new Date().getDay();
+const sidebar = document.getElementById("days");
+
+days.forEach((d,i)=>{
+    const btn=document.createElement("button");
+    btn.textContent=d.day;
+    if(i===today) btn.classList.add("active");
+    btn.onclick=()=>loadDay(i);
+    sidebar.appendChild(btn);
+});
+
+function loadDay(i){
+
+let d=days[i];
+
+document.getElementById("title").textContent =
+"Today is "+d.day+" – Focus on "+d.deity;
+
+document.getElementById("deity").textContent=d.deity;
+
+document.getElementById("image").src =
+"media/gods/"+d.img;
+
+let audio=document.getElementById("mainAudio");
+
+if(d.audio){
+audio.src="media/audio/"+d.audio;
+audio.style.display="block";
+}else{
+audio.style.display="none";
+audio.pause();
+audio.src="";
+}
+}
+
+loadDay(today);
+
+
+
+// 🎵 REAL MP3 LIBRARY ONLY
+
+const media = [
+
+"06 Mujko Pyaari raam.mp3",
+"jai ganesh 8 names.mp3",
+"kabi pyaase.mp3",
+"om nmha sivaya.mp3",
+"siya raam.mp3",
+"swarg se sundar.mp3",
+"shiva.mp3"
+
+];
+
+const library=document.getElementById("library");
+const player=document.getElementById("player");
+
+media.forEach(file=>{
+let opt=document.createElement("option");
+opt.value="media/audio/"+file;
+opt.textContent=file;
+library.appendChild(opt);
+});
+
+// load first track by default
+player.src="media/audio/"+media[0];
+
+library.onchange=()=>{
+player.src=library.value;
+player.play();
+};
+
+</script>
+
+</body>
+</html>

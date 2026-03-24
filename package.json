@@ -1,0 +1,18 @@
+{
+  "name": "shane-prayer-app",
+  "version": "1.0.0",
+  "description": "Shane Prayer App - static Firebase hosting",
+  "main": "index.js",
+  "scripts": {
+    "start": "echo \"App is static, no dev server needed\"",
+    "build": "echo \"Nothing to build, files are in build folder\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "firebase": "^12.10.0"
+  }
+}

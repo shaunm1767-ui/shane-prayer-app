@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shane Maharaj – Eternal Satsang</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #fdf6e3;
+    margin: 0;
+    padding: 16px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #7c2d12;
+  }
+
+  .date {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #555;
+  }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  }
+
+  .card h2 {
+    margin-top: 0;
+    color: #b45309;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 10px 14px;
+    background: #f59e0b;
+    color: white;
+    border-radius: 8px;
+    margin-top: 10px;
+    text-decoration: none;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .small {
+    background: #fff7ed;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>🕉 Eternal Satsang</h1>
+<div class="date" id="today"></div>
+
+<div class="card">
+  <h2>☀ Morning Prayer</h2>
+  <p>Surya Dev Jal Offering<br>Gayatri Mantra</p>
+  <div class="btn">Play Morning Chant</div>
+</div>
+
+<div class="card">
+  <h2>🪔 Evening Prayer</h2>
+  <p>Aarti · Bhajan · Reflection</p>
+  <div class="btn">Play Evening Bhajan</div>
+</div>
+
+<div class="card">
+  <h2>📿 Daily Tools</h2>
+  <div class="grid">
+    <div class="small">108 Chant</div>
+    <div class="small">Diary</div>
+    <div class="small">Alarm</div>
+    <div class="small">Reminders</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📅 Hindu Calendar (SA)</h2>
+  <p>Ekadashi · Navratri · Diwali · Pooja Days</p>
+</div>
+
+<div class="card">
+  <h2>🧑‍🦳 Priests & Temples</h2>
+  <p>Find a priest · Services · Temples</p>
+</div>
+
+<div class="card">
+  <h2>🎙 Shane Maharaj</h2>
+  <p>Teachings · Bhajans · Short Videos</p>
+</div>
+
+<script>
+  const d = new Date();
+  document.getElementById("today").innerText =
+    d.toLocaleDateString("en-ZA", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+</script>
+
+</body>
+</html>

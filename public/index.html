@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Satsang Moments</title>
+<meta charset="UTF-8">
+
+<h1>Satsang Moments</h1>
+
+<!-- Firebase compat libraries -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+</head>
+
+<body>
+
+<h2>Login</h2>
+
+<input id="email" placeholder="Email"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
+
+<button onclick="loginUser()">Login</button>
+
+<hr>
+
+<h2>Daily Satsang</h2>
+
+<button onclick="startSatsang()">Start Today's Satsang</button>
+
+<hr>
+
+<div id="festivalBanner"></div>
+
+<script src="mediaFiles.js"></script>
+<script src="festivalData.js"></script>
+
+<script>
+
+const firebaseConfig = {
+
+apiKey: "YOUR_API_KEY",
+authDomain: "shane-prayer-app-2026.firebaseapp.com",
+projectId: "shane-prayer-app-2026",
+storageBucket: "shane-prayer-app-2026.appspot.com",
+messagingSenderId: "XXXX",
+appId: "XXXX"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+function loginUser(){
+
+const email = document.getElementById("email").value;
+const password = document.getElementById("password").value;
+
+firebase.auth().signInWithEmailAndPassword(email,password)
+
+.then(()=>{
+
+alert("Login successful")
+
+})
+
+.catch((error)=>{
+
+alert(error.message)
+
+})
+
+}
+
+function startSatsang(){
+
+let playlist = mediaFiles.audio
+
+let current = 0
+
+const player = new Audio()
+
+player.src = playlist[current]
+
+player.play()
+
+player.onended = function(){
+
+current++
+
+if(current < playlist.length){
+
+player.src = playlist[current]
+
+player.play()
+
+}
+
+}
+
+}
+
+const today = new Date().toISOString().split("T")[0]
+
+if(typeof festivalData !== "undefined" && festivalData[today]){
+
+const festival = festivalData[today]
+
+document.getElementById("festivalBanner").innerHTML =
+
+"<h3>Festival Today: " + festival.name + "</h3>" +
+"<button onclick='startFestival()'>Start Golden Prayer</button>"
+
+}
+
+function startFestival(){
+
+const today = new Date().toISOString().split("T")[0]
+
+const playlist = festivalData[today].goldenPrayer
+
+let current = 0
+
+const player = new Audio()
+
+player.src = playlist[current]
+
+player.play()
+
+player.onended = function(){
+
+current++
+
+if(current < playlist.length){
+
+player.src = playlist[current]
+
+player.play()
+
+}
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

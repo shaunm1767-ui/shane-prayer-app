@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Satsang Media Dashboard</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:linear-gradient(180deg,#dbeefe,#c7e2f5);
+}
+
+header{
+background:#b3d7f0;
+text-align:center;
+padding:15px;
+font-size:22px;
+font-weight:bold;
+}
+
+.container{
+display:flex;
+height:calc(100vh - 60px);
+}
+
+.sidebar{
+width:250px;
+background:#a7cfe8;
+padding:10px;
+}
+
+.content{
+flex:1;
+padding:20px;
+overflow:auto;
+}
+
+.section{
+background:white;
+padding:15px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+#aum-slideshow img{
+width:70px;
+height:70px;
+border-radius:50%;
+margin:5px;
+animation:spin 15s linear infinite;
+}
+
+@keyframes spin{
+0%{transform:rotate(0)}
+100%{transform:rotate(360deg)}
+}
+
+#deity-slideshow img{
+width:200px;
+height:200px;
+border-radius:12px;
+margin:5px;
+}
+
+audio{
+width:100%;
+margin-top:10px;
+}
+
+#status{
+background:#111;
+color:#0f0;
+padding:10px;
+font-family:monospace;
+height:120px;
+overflow:auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>🌅 Satsang Dashboard</header>
+
+<div class="container">
+
+<div class="sidebar">
+
+<h3>Media Status</h3>
+<div id="status">Loading media checks...</div>
+
+</div>
+
+<div class="content">
+
+<div class="section">
+
+<h3>🕉 AUM Slideshow</h3>
+
+<div id="aum-slideshow">
+<img src="images/aum1.jpg">
+<img src="images/aum2.jpg">
+<img src="images/aum3.jpg">
+</div>
+
+</div>
+
+<div class="section">
+
+<h3>🙏 Deities</h3>
+
+<div id="deity-slideshow">
+<img src="images/shiva.jpg">
+<img src="images/krishna.jpg">
+<img src="images/ganesha.jpg">
+</div>
+
+</div>
+
+<div class="section">
+
+<h3>🎵 Meditation Audio</h3>
+
+<audio id="meditationAudio" controls>
+<source src="audio/meditation.mp3" type="audio/mpeg">
+</audio>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+const status = document.getElementById("status")
+
+function log(msg,color="lime"){
+const line=document.createElement("div")
+line.style.color=color
+line.textContent=msg
+status.appendChild(line)
+}
+
+function checkImages(){
+
+document.querySelectorAll("img").forEach(img=>{
+
+img.onload=()=>log("✔ Image loaded: "+img.src)
+
+img.onerror=()=>log("✖ Image FAILED: "+img.src,"red")
+
+})
+
+}
+
+function checkAudio(){
+
+const audio=document.getElementById("meditationAudio")
+
+audio.addEventListener("canplaythrough",()=>{
+log("✔ Audio ready to play")
+})
+
+audio.addEventListener("error",()=>{
+log("✖ Audio failed to load","red")
+})
+
+}
+
+checkImages()
+checkAudio()
+
+</script>
+
+</body>
+</html>

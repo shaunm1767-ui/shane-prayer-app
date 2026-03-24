@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The South African Hindu – Daily Prayer</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(180deg,#dbeefe,#c7e2f5);
+}
+header{
+  background:#b3d7f0;
+  padding:15px;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+}
+.dashboard{
+  display:flex;
+  height:calc(100vh - 60px);
+}
+.sidebar{
+  width:200px;
+  background:#a7cfe8;
+  padding:10px;
+}
+.sidebar button{
+  width:100%;
+  padding:10px;
+  margin-bottom:5px;
+  border:none;
+  background:#cfe6f7;
+  font-weight:bold;
+  cursor:pointer;
+}
+.sidebar button.active{
+  background:#f1c45b;
+}
+.content{
+  flex:1;
+  padding:20px;
+  overflow:auto;
+}
+.section{
+  background:rgba(255,255,255,0.85);
+  padding:15px;
+  margin-bottom:20px;
+  border-radius:12px;
+}
+img{
+  max-width:260px;
+  display:block;
+  margin:15px auto;
+  border-radius:12px;
+}
+audio,video{
+  width:100%;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+🌅 The South African Hindu – Daily Prayer Dashboard
+</header>
+
+<div class="dashboard">
+
+<div class="sidebar" id="dayButtons"></div>
+
+<div class="content">
+
+<div class="section">
+<h2 id="dayTitle"></h2>
+</div>
+
+<div class="section">
+<h3>🌞 Morning Surya Prayer (Daily)</h3>
+<ol>
+<li>Wake at sunrise</li>
+<li>Bathe or shower</li>
+<li>Offer Jal to Surya</li>
+<li>Recite Gayatri Mantra</li>
+<li>Meditate on vitality</li>
+</ol>
+</div>
+
+<div class="section">
+<h3 id="deityName"></h3>
+<img id="deityImage">
+<audio id="deityAudio" controls></audio>
+</div>
+
+<div class="section">
+<h3>🎵 Shane CD – Bhajans</h3>
+
+<select onchange="playTrack(this.value)">
+<option value="">-- Select Bhajan --</option>
+
+<option value="media/audio/06 Mujko Pyaari raam.mp3">Mujko Pyaari Raam</option>
+<option value="media/audio/jai ganesh 8 names.mp3">Jai Ganesh 8 Names</option>
+<option value="media/audio/kabi pyaase.mp3">Kabi Pyaase</option>
+<option value="media/audio/om nmha sivaya.mp3">Om Namah Shivaya</option>
+<option value="media/audio/siya raam.mp3">Siya Raam</option>
+<option value="media/audio/swarg se sundar.mp3">Swarg Se Sundar</option>
+<option value="media/audio/shiva.mp3">Shiva Mantra</option>
+
+</select>
+
+<audio id="bhajanPlayer" controls></audio>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+const days = [
+{day:"Sunday", deity:"Surya", img:"Surya.jpg"},
+{day:"Monday", deity:"Shiva", img:"shiva.jpg", audio:"shiva.mp3"},
+{day:"Tuesday", deity:"Hanuman", img:"Hanuman.jpg", audio:"hanuman.mp4"},
+{day:"Wednesday", deity:"Ganesha", img:"GANESHA.JPG", audio:"jai ganesh 8 names.mp3"},
+{day:"Thursday", deity:"Saraswati", img:"Saraswati.jpg"},
+{day:"Friday", deity:"Lakshmi", img:"Lakshmi.jpg"},
+{day:"Saturday", deity:"Shani", img:"shani.jpg"}
+];
+
+const todayIndex = new Date().getDay();
+const buttons = document.getElementById("dayButtons");
+
+days.forEach((d,i)=>{
+let b=document.createElement("button");
+b.textContent=d.day;
+if(i===todayIndex) b.classList.add("active");
+b.onclick=()=>loadDay(i);
+buttons.appendChild(b);
+});
+
+function loadDay(i){
+
+let d=days[i];
+
+document.getElementById("dayTitle").textContent =
+"Today is "+d.day+" – Focus on "+d.deity;
+
+document.getElementById("deityName").textContent=d.deity;
+
+document.getElementById("deityImage").src="media/gods/"+d.img;
+
+let audio=document.getElementById("deityAudio");
+
+if(d.audio){
+audio.src="media/audio/"+d.audio;
+audio.style.display="block";
+}else{
+audio.style.display="none";
+}
+
+}
+
+function playTrack(file){
+let player=document.getElementById("bhajanPlayer");
+if(file){
+player.src=file;
+player.play();
+}
+}
+
+loadDay(todayIndex);
+
+</script>
+
+</body>
+</html>

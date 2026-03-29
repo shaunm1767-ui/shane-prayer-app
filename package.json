@@ -1,18 +1,31 @@
 {
   "name": "shane-prayer-app",
   "version": "1.0.0",
-  "description": "Shane Prayer App - static Firebase hosting",
+  "private": true,
+  "description": "Shane Prayer App",
   "main": "index.js",
   "scripts": {
-    "start": "echo \"App is static, no dev server needed\"",
-    "build": "echo \"Nothing to build, files are in build folder\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "serve": "npx serve -s build",
+    "test": "react-scripts test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "firebase": "^12.10.0"
+    "firebase": "^12.10.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

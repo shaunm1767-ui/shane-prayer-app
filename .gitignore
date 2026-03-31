@@ -1,0 +1,14 @@
+node_modules/
+build/
+dist/
+.next/
+*.log
+*.zip
+*.mp4
+*.mp3
+*.wav
+*.avi
+*.mov
+public/media/
+media/
+shanepics/

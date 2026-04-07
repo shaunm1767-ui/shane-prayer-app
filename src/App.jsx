@@ -1,18 +1,24 @@
-﻿import { useState } from "react";
-import { playlist } from "./playlist";
+﻿import { useEffect, useState } from "react";
+import { loadPlaylist } from "./utils/loadPlaylist";
 
 export default function App() {
+  const [playlist, setPlaylist] = useState([]);
   const [index, setIndex] = useState(0);
 
+  useEffect(() => {
+    async function init() {
+      const data = await loadPlaylist();
+      setPlaylist(data);
+    }
+
+    init();
+  }, []);
+
+  if (playlist.length === 0) {
+    return <h2>Loading Firebase audio...</h2>;
+  }
+
   const current = playlist[index];
-
-  const next = () => {
-    setIndex((i) => (i + 1) % playlist.length);
-  };
-
-  const prev = () => {
-    setIndex((i) => (i - 1 + playlist.length) % playlist.length);
-  };
 
   return (
     <div style={{ padding: 20 }}>
@@ -21,21 +27,29 @@ export default function App() {
       <h2>{current.title}</h2>
 
       <audio
-        key={current.url}
-        controls
-        autoPlay
-        onEnded={next}
-        style={{ width: "100%" }}
-      >
-        <source src={current.url} type="audio/mpeg" />
-      </audio>
+  key={current.url}
+  controls
+  style={{ width: "100%" }}
+>
+  <source src={current.url} type="audio/mpeg" />
+</audio>
 
-      <br /><br />
+      <div style={{ marginTop: 20 }}>
+        <button
+          onClick={() =>
+            setIndex((i) => (i - 1 + playlist.length) % playlist.length)
+          }
+        >
+          ⏮ Prev
+        </button>
 
-      <button onClick={prev}>Prev</button>
-      <button onClick={next} style={{ marginLeft: 10 }}>
-        Next
-      </button>
+        <button
+          style={{ marginLeft: 10 }}
+          onClick={() => setIndex((i) => (i + 1) % playlist.length)}
+        >
+          Next ⏭
+        </button>
+      </div>
     </div>
   );
 }

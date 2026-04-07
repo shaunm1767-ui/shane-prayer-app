@@ -2,7 +2,7 @@
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBrtiWYAhVd4lx3gyY3RtJk0GEn7MotRJI",
+  apiKey: "AIzaSyBrtiWYAhVd4lx3gyY3RtKjg0En7MotRJI",
   authDomain: "shane-storage-90931.firebaseapp.com",
   projectId: "shane-storage-90931",
   storageBucket: "shane-storage-90931.firebasestorage.app",

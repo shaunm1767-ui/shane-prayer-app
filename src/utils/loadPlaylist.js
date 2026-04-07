@@ -1,21 +1,34 @@
-﻿import { storage } from "../firebase";
-import { ref, listAll, getDownloadURL } from "firebase/storage";
+﻿import { ref, listAll, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
 
-export async function loadPlaylist() {
-  const folderRef = ref(storage, "/");
+// Your Firebase category folders
+const categories = ["aarthi", "bhajan", "chalisa", "discourse"];
 
-  const result = await listAll(folderRef);
+export async function loadAllTracks() {
+  const allTracks = {};
 
-  const tracks = await Promise.all(
-    result.items.map(async (item) => {
-      const url = await getDownloadURL(item);
+  for (const category of categories) {
+    try {
+      const folderRef = ref(storage, category);
+      const res = await listAll(folderRef);
 
-      return {
-        title: item.name.replace(/\.[^/.]+$/, ""),
-        url
-      };
-    })
-  );
+      const tracks = await Promise.all(
+        res.items.map(async (item) => {
+          const url = await getDownloadURL(item);
+          return {
+            name: item.name,
+            url,
+            category
+          };
+        })
+      );
 
-  return tracks;
+      allTracks[category] = tracks;
+    } catch (err) {
+      console.log("Error loading category:", category, err);
+      allTracks[category] = [];
+    }
+  }
+
+  return allTracks;
 }

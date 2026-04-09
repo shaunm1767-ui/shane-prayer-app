@@ -1,10 +1,9 @@
 ﻿import { ref, listAll, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
 
-// Your Firebase category folders
 const categories = ["aarthi", "bhajan", "chalisa", "discourse"];
 
-export async function loadAllTracks() {
+export async function loadPlaylist() {
   const allTracks = {};
 
   for (const category of categories) {
@@ -25,7 +24,6 @@ export async function loadAllTracks() {
 
       allTracks[category] = tracks;
     } catch (err) {
-      console.log("Error loading category:", category, err);
       allTracks[category] = [];
     }
   }

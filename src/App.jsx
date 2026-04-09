@@ -1,55 +1,40 @@
-﻿import { useEffect, useState } from "react";
-import { loadPlaylist } from "./utils/loadPlaylist";
+﻿import React from "react";
 
-export default function App() {
-  const [playlist, setPlaylist] = useState([]);
-  const [index, setIndex] = useState(0);
+function App() {
+  const playAudio = () => {
+    const audio = new Audio(
+      "https://firebasestorage.googleapis.com/v0/b/shane-storage-90931.firebasestorage.app/o/aarti%2Fshane_Jaiambegauri_arthi.mp3?alt=media&token=423af3bb-a31d-483b-81f7-dc1123d1a5ca"
+    );
 
-  useEffect(() => {
-    async function init() {
-      const data = await loadPlaylist();
-      setPlaylist(data);
-    }
-
-    init();
-  }, []);
-
-  if (playlist.length === 0) {
-    return <h2>Loading Firebase audio...</h2>;
-  }
-
-  const current = playlist[index];
+    audio.play()
+      .then(() => {
+        console.log("✅ Audio playing");
+      })
+      .catch((err) => {
+        console.error("❌ PLAY ERROR:", err);
+      });
+  };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Shane Prayer App</h1>
+    <div style={{ padding: "40px", textAlign: "center" }}>
+      <h1>🕉 Shane Prayer App</h1>
 
-      <h2>{current.title}</h2>
-
-      <audio
-  key={current.url}
-  controls
-  style={{ width: "100%" }}
->
-  <source src={current.url} type="audio/mpeg" />
-</audio>
-
-      <div style={{ marginTop: 20 }}>
-        <button
-          onClick={() =>
-            setIndex((i) => (i - 1 + playlist.length) % playlist.length)
-          }
-        >
-          ⏮ Prev
-        </button>
-
-        <button
-          style={{ marginLeft: 10 }}
-          onClick={() => setIndex((i) => (i + 1) % playlist.length)}
-        >
-          Next ⏭
-        </button>
-      </div>
+      <button
+        onClick={playAudio}
+        style={{
+          padding: "15px 30px",
+          fontSize: "18px",
+          cursor: "pointer",
+          borderRadius: "10px",
+          border: "none",
+          backgroundColor: "#4CAF50",
+          color: "white"
+        }}
+      >
+        ▶ Play Aarti
+      </button>
     </div>
   );
 }
+
+export default App;

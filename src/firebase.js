@@ -2,10 +2,10 @@
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBrtiWYAhVd4lx3gyY3RtKjg0En7MotRJI",
+  apiKey: "AIzaSyBrtiWYAhVd4lx3gyY3RtJk0GEn7MotRJI",
   authDomain: "shane-storage-90931.firebaseapp.com",
   projectId: "shane-storage-90931",
-  storageBucket: "shane-storage-90931.firebasestorage.app",
+  storageBucket: "shane-storage-90931.appspot.com",
   messagingSenderId: "321117848066",
   appId: "1:321117848066:web:09e74895b8ecec3c475d1b"
 };

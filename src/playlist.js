@@ -1,12 +1,28 @@
-﻿// CHECKPOINT: 2026-04-07 - WORKING FIREBASE AUDIO STATE
-// DO NOT MODIFY WITHOUT BACKUP
-export const playlist = [
-  {
-    title: "Hanuman Chalisa",
-    url: "https://firebasestorage.googleapis.com/v0/b/shane-storage-90931.firebasestorage.app/o/shane_hanuman_chalisa%20-%20Copy.mp3?alt=media&token=fe0803e8-db0c-4adb-826e-cca04446dc3c"
-  },
-  {
-    title: "Ganesh 8 Names",
-    url: "https://firebasestorage.googleapis.com/v0/b/shane-storage-90931.firebasestorage.app/o/jai%20ganesh%208%20names.mp3?alt=media&token=fe0803e8-db0c-4adb-826e-cca04446dc3c"
+﻿import { ref, listAll, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
+
+const categories = ["aarthi", "bhajan", "chalisa", "discourse"];
+
+export async function loadPlaylist() {
+  let tracks = [];
+
+  for (const category of categories) {
+    const folderRef = ref(storage, category);
+    const files = await listAll(folderRef);
+
+    const urls = await Promise.all(
+      files.items.map(async (item) => {
+        const url = await getDownloadURL(item);
+        return {
+          title: item.name,
+          url,
+          category
+        };
+      })
+    );
+
+    tracks = [...tracks, ...urls];
   }
-];
+
+  return tracks;
+}

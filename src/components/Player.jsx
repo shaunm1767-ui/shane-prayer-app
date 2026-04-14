@@ -1,14 +1,56 @@
-export default function Player() {
-  const audioUrl =
-    "https://firebasestorage.googleapis.com/v0/b/shane-prayer-app-2026.firebasestorage.app/o/jai%20ganesh%208%20names.mp3?alt=media&token=847ecdab-8e23-496c-9e39-98f830cbaa8b";
+import React, { useEffect, useRef } from "react";
+import { loadPlaylist } from "../utils/loadPlaylist";
+
+function App() {
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    const load = async () => {
+      const data = await loadPlaylist("aarti");
+      console.log("Loaded playlist:", data);
+    };
+
+    load();
+  }, []);
+
+  const playAudio = async (url) => {
+    try {
+      if (!audioRef.current) {
+        audioRef.current = new Audio(url);
+      } else {
+        audioRef.current.src = url;
+      }
+
+      await audioRef.current.play();
+      console.log("✅ Playing:", url);
+    } catch (err) {
+      console.error("❌ PLAY ERROR:", err);
+    }
+  };
 
   return (
-    <div style={{ marginTop: 20 }}>
-      <h3>Prayer Audio</h3>
+    <div style={{ padding: 40, textAlign: "center" }}>
+      <h1>🕉 Shane Prayer App</h1>
 
-      <audio controls style={{ width: "100%" }}>
-        <source src={audioUrl} type="audio/mpeg" />
-      </audio>
+      <button
+        onClick={() =>
+          playAudio(
+            "https://firebasestorage.googleapis.com/v0/b/shane-storage-90931.firebasestorage.app/o/aarti%2Fshane_Jaiambegauri_arthi.mp3?alt=media&token=423af3bb-a31d-483b-81f7-dc1123d1a5ca"
+          )
+        }
+        style={{
+          padding: "15px 30px",
+          fontSize: 18,
+          background: "green",
+          color: "white",
+          border: "none",
+          borderRadius: 10,
+        }}
+      >
+        ▶ Play Aarti
+      </button>
     </div>
   );
 }
+
+export default App;

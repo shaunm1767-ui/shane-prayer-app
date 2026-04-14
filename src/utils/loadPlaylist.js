@@ -1,32 +1,22 @@
-﻿import { ref, listAll, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase";
-
-const categories = ["aarthi", "bhajan", "chalisa", "discourse"];
-
-export async function loadPlaylist() {
-  const allTracks = {};
-
-  for (const category of categories) {
-    try {
-      const folderRef = ref(storage, category);
-      const res = await listAll(folderRef);
-
-      const tracks = await Promise.all(
-        res.items.map(async (item) => {
-          const url = await getDownloadURL(item);
-          return {
-            name: item.name,
-            url,
-            category
-          };
-        })
-      );
-
-      allTracks[category] = tracks;
-    } catch (err) {
-      allTracks[category] = [];
+const PLAYLISTS = {
+  aarti: [
+    {
+      title: "Jai Ambe Gauri",
+      url: "https://firebasestorage.googleapis.com/v0/b/shane-storage-90931.firebasestorage.app/o/aarti%2Fshane_Jaiambegauri_arthi.mp3?alt=media&token=423af3bb-a31d-483b-81f7-dc1123d1a5ca"
+    },
+    {
+      title: "Hanuman Aarti",
+      url: "https://firebasestorage.googleapis.com/v0/b/shane-storage-90931.firebasestorage.app/o/aarti%2Fshane_hanuman_arthi.mp3?alt=media&token=YOUR_TOKEN"
     }
-  }
+  ]
+};
 
-  return allTracks;
-}
+export const loadPlaylist = async (category = "aarti") => {
+  console.log("📦 Loading static playlist:", category);
+
+  const list = PLAYLISTS[category] || [];
+
+  console.log("✅ TRACKS LOADED:", list);
+
+  return list;
+};

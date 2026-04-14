@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saveera 5KM Fun Run</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #0f172a;
+        color: #fff;
+        text-align: center;
+    }
+    header {
+        padding: 30px 20px;
+        background: #1e293b;
+    }
+    h1 {
+        margin: 0;
+        font-size: 28px;
+    }
+    .container {
+        padding: 20px;
+    }
+    .card {
+        background: #1e293b;
+        padding: 20px;
+        margin: 15px auto;
+        border-radius: 12px;
+        max-width: 400px;
+    }
+    input, button {
+        width: 90%;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 8px;
+        border: none;
+        font-size: 14px;
+    }
+    input {
+        background: #334155;
+        color: #fff;
+    }
+    button {
+        background: #22c55e;
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .leaderboard div {
+        background: #334155;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 6px;
+    }
+    .hidden {
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🏃 Saveera 5KM Fun Run</h1>
+    <p>30 April | Open to Public</p>
+    <p id="countdown"></p>
+</header>
+
+<div class="container">
+
+    <!-- Registration -->
+    <div class="card">
+        <h2>Register</h2>
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="tel" id="phone" placeholder="Mobile Number" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="emergency" placeholder="Emergency Contact">
+        <button onclick="register()">Register Now</button>
+        <p id="confirmation"></p>
+    </div>
+
+    <!-- Route -->
+    <div class="card">
+        <h2>Route</h2>
+        <p>5KM loop starting & ending at Saveera Hotel</p>
+        <iframe 
+            src="https://maps.google.com/maps?q=durban&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+            width="100%" height="200" style="border:0;"></iframe>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="card">
+        <h2>Leaderboard</h2>
+        <div class="leaderboard">
+            <div>🥇 John D – 22:15</div>
+            <div>🥈 Sarah M – 24:03</div>
+            <div>🥉 Kevin R – 25:40</div>
+            <div>4. Lisa P – 27:10</div>
+            <div>5. Ahmed K – 28:55</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Countdown
+const eventDate = new Date("April 30, 2026 07:00:00").getTime();
+const countdownEl = document.getElementById("countdown");
+
+setInterval(() => {
+    const now = new Date().getTime();
+    const diff = eventDate - now;
+
+    if (diff < 0) {
+        countdownEl.innerHTML = "🏁 Race Day!";
+        return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+
+    countdownEl.innerHTML = `Starts in ${days} days, ${hours} hrs`;
+}, 1000);
+
+// Registration
+let runnerCount = 1;
+
+function register() {
+    const name = document.getElementById("name").value;
+
+    if (!name) {
+        alert("Enter your name");
+        return;
+    }
+
+    const id = "SVR-" + String(runnerCount).padStart(3, '0');
+    runnerCount++;
+
+    document.getElementById("confirmation").innerHTML =
+        `✅ Registered! Your Runner ID: <strong>${id}</strong>`;
+}
+</script>
+
+</body>
+</html>

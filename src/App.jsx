@@ -3,9 +3,20 @@ import { loadPlaylist } from "./utils/loadPlaylist";
 import { usePrayerPlayer } from "./hooks/usePrayerPlayer";
 import { getSpiritualMode, modePlaylistMap } from "./core/spiritualMode";
 
+// ✅ Firebase (CLEAN)
+import { auth } from "./firebase";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+
 function App() {
   const [tracks, setTracks] = useState([]);
   const [mode, setMode] = useState("");
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const {
     play,
@@ -14,11 +25,28 @@ function App() {
     prev,
     isPlaying,
     currentTrack,
-    setTracks: loadTracks, // IMPORTANT: hook alias fix
+    setTracks: loadTracks,
   } = usePrayerPlayer();
 
   // -----------------------------
-  // INIT LOAD
+  // LOGIN PERSISTENCE
+  // -----------------------------
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        console.log("✅ Logged in:", currentUser.email);
+        setUser(currentUser);
+      } else {
+        console.log("❌ Not logged in");
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // -----------------------------
+  // LOAD PLAYLIST
   // -----------------------------
   useEffect(() => {
     const init = async () => {
@@ -34,8 +62,13 @@ function App() {
 
         console.log("🎧 Tracks loaded:", data);
 
+        if (!data || data.length === 0) {
+          console.warn("⚠️ No tracks found");
+          return;
+        }
+
         setTracks(data);
-        loadTracks(data); // 🔥 correct hook call (NO load(), NO crash)
+        loadTracks(data);
       } catch (err) {
         console.error("❌ Init error:", err);
       }
@@ -45,18 +78,68 @@ function App() {
   }, [loadTracks]);
 
   // -----------------------------
-  // PLAY HANDLER
+  // AUTH FUNCTIONS
+  // -----------------------------
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("✅ Login success");
+    } catch (err) {
+      console.error("❌ Login error:", err.message);
+      alert(err.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
+  // -----------------------------
+  // PLAYER
   // -----------------------------
   const handlePlay = (track) => {
-    if (!track?.url) return;
+    if (!track || !track.url) {
+      console.warn("⚠️ Invalid track");
+      return;
+    }
     play(track);
   };
 
+  // -----------------------------
+  // UI
+  // -----------------------------
   return (
     <div style={styles.container}>
-      <h1>🕉 Prayer App - Spiritual Mode</h1>
+      <h1>🕉 Prayer App</h1>
 
       <h3>Mode: {mode}</h3>
+
+      {/* LOGIN BOX */}
+      <div style={styles.userBox}>
+        {user ? (
+          <>
+            <p>👤 {user.email}</p>
+            <button onClick={handleLogout}>Logout</button>
+          </>
+        ) : (
+          <>
+            <input
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              style={styles.input}
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button onClick={handleLogin}>Login</button>
+          </>
+        )}
+      </div>
 
       {/* NOW PLAYING */}
       {currentTrack && (
@@ -72,7 +155,13 @@ function App() {
         {isPlaying ? (
           <button onClick={pause}>⏸ Pause</button>
         ) : (
-          <button onClick={() => tracks[0] && handlePlay(tracks[0])}>
+          <button
+            onClick={() =>
+              currentTrack
+                ? handlePlay(currentTrack)
+                : tracks[0] && handlePlay(tracks[0])
+            }
+          >
             ▶ Play
           </button>
         )}
@@ -109,10 +198,18 @@ const styles = {
     background: "#f7f3ea",
     minHeight: "100vh",
   },
+  userBox: {
+    marginBottom: 15,
+  },
+  input: {
+    display: "block",
+    margin: "5px auto",
+    padding: 8,
+    width: 200,
+  },
   nowPlaying: {
     margin: 15,
     fontSize: 18,
-    color: "#333",
     fontWeight: "bold",
   },
   controls: {
@@ -130,7 +227,6 @@ const styles = {
     background: "white",
     borderRadius: 10,
     cursor: "pointer",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
   },
 };
 

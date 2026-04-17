@@ -18,3 +18,15 @@ shanepics/
 # system files
 .DS_Store
 Thumbs.db
+# ❌ NEVER COMMIT BUILD OUTPUT
+build/
+
+# ❌ MEDIA / LARGE FILES
+*.mp3
+*.mp4
+*.zip
+*.wma
+
+# Optional raw folders
+media/
+shanepics/

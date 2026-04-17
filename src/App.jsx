@@ -1,5 +1,3 @@
-// src/App.jsx
-
 import React, { useEffect, useState } from "react";
 import { loadPlaylist } from "./utils/loadPlaylist";
 import { usePrayerPlayer } from "./hooks/usePrayerPlayer";
@@ -9,32 +7,46 @@ function App() {
   const [tracks, setTracks] = useState([]);
   const [mode, setMode] = useState("");
 
-  const { load, play, pause, next, prev } = usePrayerPlayer();
+  const {
+    play,
+    pause,
+    next,
+    prev,
+    isPlaying,
+    currentTrack,
+    setTracks: loadTracks, // IMPORTANT: hook alias fix
+  } = usePrayerPlayer();
 
-  // 🔹 LOAD PLAYLIST BASED ON MODE
+  // -----------------------------
+  // INIT LOAD
+  // -----------------------------
   useEffect(() => {
     const init = async () => {
-      const detectedMode = getSpiritualMode();
-      setMode(detectedMode);
+      try {
+        const detectedMode = getSpiritualMode();
+        setMode(detectedMode);
 
-      const folder = modePlaylistMap[detectedMode];
+        const folder = modePlaylistMap[detectedMode];
 
-      console.log("📦 Loading folder:", folder);
+        console.log("📦 Loading folder:", folder);
 
-      const data = await loadPlaylist(folder);
+        const data = await loadPlaylist(folder);
 
-      console.log("🎧 Tracks loaded:", data);
+        console.log("🎧 Tracks loaded:", data);
 
-      setTracks(data);
-
-      // 🔥 LOAD INTO PLAYER ENGINE
-      load(data);
+        setTracks(data);
+        loadTracks(data); // 🔥 correct hook call (NO load(), NO crash)
+      } catch (err) {
+        console.error("❌ Init error:", err);
+      }
     };
 
     init();
-  }, []);
+  }, [loadTracks]);
 
-  // 🔹 HANDLE PLAY CLICK
+  // -----------------------------
+  // PLAY HANDLER
+  // -----------------------------
   const handlePlay = (track) => {
     if (!track?.url) return;
     play(track);
@@ -46,22 +58,29 @@ function App() {
 
       <h3>Mode: {mode}</h3>
 
-      {/* 🎮 CONTROLS */}
+      {/* NOW PLAYING */}
+      {currentTrack && (
+        <div style={styles.nowPlaying}>
+          🎧 Now Playing: {currentTrack.title}
+        </div>
+      )}
+
+      {/* CONTROLS */}
       <div style={styles.controls}>
         <button onClick={prev}>⏮ Prev</button>
 
-        <button
-          onClick={() => tracks.length && handlePlay(tracks[0])}
-        >
-          ▶ Play
-        </button>
-
-        <button onClick={pause}>⏸ Pause</button>
+        {isPlaying ? (
+          <button onClick={pause}>⏸ Pause</button>
+        ) : (
+          <button onClick={() => tracks[0] && handlePlay(tracks[0])}>
+            ▶ Play
+          </button>
+        )}
 
         <button onClick={next}>⏭ Next</button>
       </div>
 
-      {/* 📜 TRACK LIST */}
+      {/* TRACK LIST */}
       <div style={styles.list}>
         {tracks.length === 0 && <p>Loading prayers...</p>}
 
@@ -79,7 +98,9 @@ function App() {
   );
 }
 
-// 🎨 SIMPLE CLEAN UI
+// -----------------------------
+// STYLES
+// -----------------------------
 const styles = {
   container: {
     textAlign: "center",
@@ -87,6 +108,12 @@ const styles = {
     fontFamily: "Arial",
     background: "#f7f3ea",
     minHeight: "100vh",
+  },
+  nowPlaying: {
+    margin: 15,
+    fontSize: 18,
+    color: "#333",
+    fontWeight: "bold",
   },
   controls: {
     margin: 20,

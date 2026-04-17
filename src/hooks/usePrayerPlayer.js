@@ -1,64 +1,136 @@
-// src/hooks/usePrayerPlayer.js
+import { useRef, useState, useCallback } from "react";
 
-let playlist = [];
-let currentIndex = 0;
-let audio = new Audio();
+export function usePrayerPlayer() {
+  const audioRef = useRef(null);
 
-export const usePrayerPlayer = () => {
-  const load = (tracks) => {
-    playlist = tracks || [];
-    currentIndex = 0;
-  };
+  const [tracks, setTracksState] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const play = (track) => {
-    if (!playlist.length) return;
+  // -----------------------------
+  // LOAD TRACKS
+  // -----------------------------
+  const setTracks = useCallback((list) => {
+    if (!Array.isArray(list)) return;
 
-    if (track) {
-      const index = playlist.findIndex(t => t.url === track.url);
-      if (index !== -1) currentIndex = index;
+    setTracksState(list);
+    setCurrentIndex(0);
+
+    // cleanup old audio immediately
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
     }
+  }, []);
 
-    const current = playlist[currentIndex];
+  // -----------------------------
+  // CORE PLAY ENGINE
+  // -----------------------------
+  const playTrack = useCallback(
+    async (index) => {
+      if (!tracks.length) return;
 
-    if (!current?.url) return;
+      // clamp + loop logic
+      let safeIndex = index;
 
-    console.log("▶ Playing:", current.title);
+      if (safeIndex < 0) safeIndex = tracks.length - 1;
+      if (safeIndex >= tracks.length) safeIndex = 0;
 
-    audio.src = current.url;
-    audio.play().catch(err => {
-      console.error("❌ AUDIO ERROR:", err);
-    });
-  };
+      const track = tracks[safeIndex];
 
-  const pause = () => {
-    audio.pause();
-  };
+      if (!track?.url) {
+        console.warn("⚠️ Missing URL at index:", safeIndex);
+        return;
+      }
 
-  const next = () => {
-    if (!playlist.length) return;
+      try {
+        setCurrentIndex(safeIndex);
 
-    currentIndex = (currentIndex + 1) % playlist.length;
-    play();
-  };
+        // -----------------------------
+        // HARD RESET AUDIO ENGINE
+        // -----------------------------
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.src = "";
+          audioRef.current.load();
+          audioRef.current = null;
+        }
 
-  const prev = () => {
-    if (!playlist.length) return;
+        const audio = new Audio();
+        audio.src = track.url;
+        audio.preload = "auto";
 
-    currentIndex =
-      (currentIndex - 1 + playlist.length) % playlist.length;
-    play();
-  };
+        audioRef.current = audio;
 
-  audio.onended = () => {
-    console.log("⏭ Auto next");
-    next();
-  };
+        // important for Firebase streaming stability
+        audio.load();
+
+        await audio.play();
+
+        setIsPlaying(true);
+
+        // auto-next (clean chain)
+        audio.onended = () => {
+          playTrack(safeIndex + 1);
+        };
+
+        audio.onerror = (e) => {
+          console.error("❌ Audio error:", track.title, e);
+          setIsPlaying(false);
+        };
+      } catch (err) {
+        console.error("❌ Playback failed:", err);
+        setIsPlaying(false);
+      }
+    },
+    [tracks]
+  );
+
+  // -----------------------------
+  // PUBLIC API
+  // -----------------------------
+  const play = useCallback(
+    (track) => {
+      if (!tracks.length) return;
+
+      const index = tracks.findIndex((t) => t.url === track.url);
+      if (index !== -1) {
+        playTrack(index);
+      }
+    },
+    [tracks, playTrack]
+  );
+
+  const next = useCallback(() => {
+    playTrack(currentIndex + 1);
+  }, [currentIndex, playTrack]);
+
+  const prev = useCallback(() => {
+    playTrack(currentIndex - 1);
+  }, [currentIndex, playTrack]);
+
+  const pause = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, []);
+
+  // -----------------------------
+  // CURRENT TRACK
+  // -----------------------------
+  const currentTrack = tracks[currentIndex] || null;
 
   return {
-    load,
+    tracks,
+    setTracks,
     play,
-    pause,
     next,
     prev,
+    pause,
+    isPlaying,
+    currentTrack,
+    currentIndex,
   };
-};
+}

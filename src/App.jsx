@@ -1,3 +1,5 @@
+// src/App.jsx
+
 import React, { useEffect, useState } from "react";
 import { loadPlaylist } from "./utils/loadPlaylist";
 import { usePrayerPlayer } from "./hooks/usePrayerPlayer";
@@ -7,9 +9,9 @@ function App() {
   const [tracks, setTracks] = useState([]);
   const [mode, setMode] = useState("");
 
-  const { play, pause, isPlaying, currentTrack } = usePrayerPlayer();
+  const { load, play, pause, next, prev } = usePrayerPlayer();
 
-  // 1. LOAD DATA
+  // 🔹 LOAD PLAYLIST BASED ON MODE
   useEffect(() => {
     const init = async () => {
       const detectedMode = getSpiritualMode();
@@ -24,12 +26,15 @@ function App() {
       console.log("🎧 Tracks loaded:", data);
 
       setTracks(data);
+
+      // 🔥 LOAD INTO PLAYER ENGINE
+      load(data);
     };
 
     init();
   }, []);
 
-  // 2. HANDLE PLAY (IMPORTANT: user gesture safe)
+  // 🔹 HANDLE PLAY CLICK
   const handlePlay = (track) => {
     if (!track?.url) return;
     play(track);
@@ -41,27 +46,22 @@ function App() {
 
       <h3>Mode: {mode}</h3>
 
-      {/* NOW PLAYING */}
-      {currentTrack && (
-        <div style={styles.nowPlaying}>
-          🎧 Now Playing: {currentTrack.title}
-        </div>
-      )}
-
-      {/* CONTROLS */}
+      {/* 🎮 CONTROLS */}
       <div style={styles.controls}>
-        {isPlaying ? (
-          <button onClick={pause}>⏸ Pause</button>
-        ) : (
-          <button
-            onClick={() => tracks[0] && handlePlay(tracks[0])}
-          >
-            ▶ Play First Track
-          </button>
-        )}
+        <button onClick={prev}>⏮ Prev</button>
+
+        <button
+          onClick={() => tracks.length && handlePlay(tracks[0])}
+        >
+          ▶ Play
+        </button>
+
+        <button onClick={pause}>⏸ Pause</button>
+
+        <button onClick={next}>⏭ Next</button>
       </div>
 
-      {/* TRACK LIST */}
+      {/* 📜 TRACK LIST */}
       <div style={styles.list}>
         {tracks.length === 0 && <p>Loading prayers...</p>}
 
@@ -79,6 +79,7 @@ function App() {
   );
 }
 
+// 🎨 SIMPLE CLEAN UI
 const styles = {
   container: {
     textAlign: "center",
@@ -87,14 +88,11 @@ const styles = {
     background: "#f7f3ea",
     minHeight: "100vh",
   },
-  nowPlaying: {
-    margin: 15,
-    fontSize: 18,
-    color: "#333",
-    fontWeight: "bold",
-  },
   controls: {
     margin: 20,
+    display: "flex",
+    justifyContent: "center",
+    gap: 10,
   },
   list: {
     marginTop: 20,

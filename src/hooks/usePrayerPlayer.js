@@ -1,54 +1,64 @@
-import { useRef, useState } from "react";
+// src/hooks/usePrayerPlayer.js
+
+let playlist = [];
+let currentIndex = 0;
+let audio = new Audio();
 
 export const usePrayerPlayer = () => {
-  const audioRef = useRef(new Audio());
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState(null);
-
-  // 🔊 PLAY TRACK
-  const play = async (track) => {
-    try {
-      if (!track?.url) {
-        console.warn("⚠️ No URL found for track");
-        return;
-      }
-
-      console.log("🎵 Attempting to play:", track.url);
-
-      // 🔁 Reset audio completely before new play
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-
-      // 🔥 CRITICAL: set src AFTER reset
-      audioRef.current.src = track.url;
-
-      // 🔊 Force load
-      await audioRef.current.load();
-
-      // ▶ PLAY
-      await audioRef.current.play();
-
-      setCurrentTrack(track);
-      setIsPlaying(true);
-
-      console.log("✅ PLAYING:", track.title);
-
-    } catch (err) {
-      console.error("❌ AUDIO PLAY ERROR:", err);
-    }
+  const load = (tracks) => {
+    playlist = tracks || [];
+    currentIndex = 0;
   };
 
-  // ⏸ PAUSE
+  const play = (track) => {
+    if (!playlist.length) return;
+
+    if (track) {
+      const index = playlist.findIndex(t => t.url === track.url);
+      if (index !== -1) currentIndex = index;
+    }
+
+    const current = playlist[currentIndex];
+
+    if (!current?.url) return;
+
+    console.log("▶ Playing:", current.title);
+
+    audio.src = current.url;
+    audio.play().catch(err => {
+      console.error("❌ AUDIO ERROR:", err);
+    });
+  };
+
   const pause = () => {
-    audioRef.current.pause();
-    setIsPlaying(false);
+    audio.pause();
+  };
+
+  const next = () => {
+    if (!playlist.length) return;
+
+    currentIndex = (currentIndex + 1) % playlist.length;
+    play();
+  };
+
+  const prev = () => {
+    if (!playlist.length) return;
+
+    currentIndex =
+      (currentIndex - 1 + playlist.length) % playlist.length;
+    play();
+  };
+
+  audio.onended = () => {
+    console.log("⏭ Auto next");
+    next();
   };
 
   return {
+    load,
     play,
     pause,
-    isPlaying,
-    currentTrack,
+    next,
+    prev,
   };
 };

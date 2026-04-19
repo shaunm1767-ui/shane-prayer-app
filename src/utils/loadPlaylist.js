@@ -1,13 +1,11 @@
-// src/utils/loadPlaylist.js
-
 import { ref, listAll, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
 
 export default async function loadPlaylist(folder = "aarti") {
   try {
-    console.log("📦 SAFE FIREBASE LOAD:", folder);
+    console.log("📦 SAFE LOAD:", folder);
 
-    const folderRef = ref(storage, `${folder}/`);
+    const folderRef = ref(storage, folder);
     const result = await listAll(folderRef);
 
     const tracks = await Promise.all(
@@ -21,10 +19,10 @@ export default async function loadPlaylist(folder = "aarti") {
       })
     );
 
-    console.log("🎧 TRACKS LOADED:", tracks);
+    console.log("🎧 LOADED:", tracks);
     return tracks;
   } catch (err) {
-    console.error("❌ Playlist load failed:", err);
+    console.error("❌ Playlist error:", err);
     return [];
   }
 }

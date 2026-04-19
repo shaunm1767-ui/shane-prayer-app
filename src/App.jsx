@@ -1,111 +1,174 @@
-// src/App.jsx
-
-import { useEffect, useRef, useState } from "react";
-import { auth } from "./firebase";
+import React, { useEffect, useRef, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "./firebase";
 import loadPlaylist from "./utils/loadPlaylist";
 
 export default function App() {
-  const audioRef = useRef(new Audio());
   const [user, setUser] = useState(null);
+  const [mode, setMode] = useState("aarti");
   const [tracks, setTracks] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [folder, setFolder] = useState("aarti");
 
-  // AUTH
+  const audioRef = useRef(null);
+
+  // 🔐 AUTH
   useEffect(() => {
     console.log("🔐 Firebase auth init...");
-
     const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u || null);
       console.log("🔐 Auth state:", u);
+      setUser(u);
     });
-
     return () => unsub();
   }, []);
 
-  // LOAD MUSIC
+  // 📦 LOAD PLAYLIST
   useEffect(() => {
-    async function load() {
-      console.log("📦 Loading mode:", folder);
-      const data = await loadPlaylist(folder);
+    const fetchTracks = async () => {
+      console.log("📦 Loading mode:", mode);
+      const data = await loadPlaylist(mode);
+      console.log("🎧 TRACKS LOADED:", data);
       setTracks(data);
       setCurrentIndex(0);
-    }
+    };
+    fetchTracks();
+  }, [mode]);
 
-    load();
-  }, [folder]);
-
-  // PLAY TRACK
-  const play = (index) => {
-    if (!tracks.length) return;
+  // 🎧 PLAY TRACK (LOCKED)
+  const playTrack = (index) => {
+    if (!tracks[index] || !audioRef.current) return;
 
     const track = tracks[index];
-    if (!track) return;
 
-    console.log("🎧 PLAYING:", track.name);
+    try {
+      // STOP previous
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
 
-    audioRef.current.pause();
-    audioRef.current.src = track.url;
-    audioRef.current.load();
+      // SET new source
+      audioRef.current.src = track.url;
 
-    audioRef.current
-      .play()
-      .catch((err) => console.error("❌ PLAY ERROR:", err));
-
-    setCurrentIndex(index);
+      // PLAY safely
+      audioRef.current
+        .play()
+        .then(() => {
+          console.log("🎧 PLAYING:", track.name);
+          setCurrentIndex(index);
+        })
+        .catch((err) => {
+          console.error("❌ PLAY ERROR:", err);
+        });
+    } catch (err) {
+      console.error("❌ CRITICAL PLAY ERROR:", err);
+    }
   };
 
-  const next = () => {
-    const i = (currentIndex + 1) % tracks.length;
-    play(i);
+  const playNext = () => {
+    if (tracks.length === 0) return;
+    const next = (currentIndex + 1) % tracks.length;
+    playTrack(next);
   };
 
-  const prev = () => {
-    const i = (currentIndex - 1 + tracks.length) % tracks.length;
-    play(i);
+  const playPrev = () => {
+    if (tracks.length === 0) return;
+    const prev = (currentIndex - 1 + tracks.length) % tracks.length;
+    playTrack(prev);
   };
+
+  const handleLogout = () => {
+    signOut(auth);
+  };
+
+  // ⏭ AUTO NEXT TRACK
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleEnded = () => {
+      playNext();
+    };
+
+    audio.addEventListener("ended", handleEnded);
+    return () => audio.removeEventListener("ended", handleEnded);
+  }, [currentIndex, tracks]);
+
+  // 🔐 LOGIN BLOCK
+  if (!user) {
+    return (
+      <div style={{ padding: 40, textAlign: "center" }}>
+        <h2>🔐 Please login to continue</h2>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: 30, fontFamily: "Arial" }}>
-      <h2>🕉 Prayer App</h2>
+    <div style={{ padding: 20, color: "white", background: "#121212", minHeight: "100vh" }}>
+      <h1>🕉 Prayer App</h1>
 
-      {/* USER */}
-      <div>
-        {user ? (
-          <>
-            👤 {user.email}
-            <button onClick={() => signOut(auth)}>Logout</button>
-          </>
-        ) : (
-          <p>Not logged in</p>
-        )}
+      <div style={{ marginBottom: 20 }}>
+        👤 {user.email}
+        <button onClick={handleLogout} style={{ marginLeft: 10 }}>
+          Logout
+        </button>
       </div>
 
-      {/* MODE SWITCH */}
-      <div style={{ marginTop: 10 }}>
+      {/* MODE SELECT */}
+      <div style={{ marginBottom: 20 }}>
         {["aarti", "bhajan", "chalisa", "discourse"].map((m) => (
-          <button key={m} onClick={() => setFolder(m)}>
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            style={{
+              margin: 5,
+              padding: "10px 15px",
+              background: mode === m ? "#1db954" : "#333",
+              color: "white",
+              border: "none",
+              borderRadius: 5,
+            }}
+          >
             {m}
           </button>
         ))}
       </div>
 
-      {/* PLAYER */}
-      <h3 style={{ marginTop: 20 }}>🎧 Now Playing</h3>
-      <p>{tracks[currentIndex]?.name || "No track loaded"}</p>
+      {/* NOW PLAYING */}
+      <div style={{ marginBottom: 20 }}>
+        <h3>🎧 Now Playing</h3>
+        {tracks[currentIndex]
+          ? tracks[currentIndex].name
+          : "No track loaded"}
+      </div>
 
-      <button onClick={prev}>⏮ Prev</button>
-      <button onClick={() => play(currentIndex)}>▶ Play</button>
-      <button onClick={next}>⏭ Next</button>
+      {/* CONTROLS */}
+      <div style={{ marginBottom: 20 }}>
+        <button onClick={playPrev}>⏮ Prev</button>
+        <button onClick={() => audioRef.current?.play()}>▶ Play</button>
+        <button onClick={() => audioRef.current?.pause()}>⏸ Pause</button>
+        <button onClick={playNext}>⏭ Next</button>
+      </div>
 
       {/* PLAYLIST */}
-      <h4 style={{ marginTop: 20 }}>🪔 Playlist</h4>
-      {tracks.map((t, i) => (
-        <div key={i}>
-          <button onClick={() => play(i)}>{t.name}</button>
-        </div>
-      ))}
+      <div>
+        <h3>🪔 Playlist</h3>
+        {tracks.map((t, i) => (
+          <div
+            key={i}
+            onClick={() => playTrack(i)}
+            style={{
+              padding: 10,
+              cursor: "pointer",
+              background: i === currentIndex ? "#1db954" : "#222",
+              marginBottom: 5,
+              borderRadius: 5,
+            }}
+          >
+            {t.name}
+          </div>
+        ))}
+      </div>
+
+      {/* AUDIO ELEMENT */}
+      <audio ref={audioRef} />
     </div>
   );
 }

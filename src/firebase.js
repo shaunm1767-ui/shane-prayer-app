@@ -1,23 +1,20 @@
 ﻿import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
-// 🔥 FIREBASE CONFIG (FIXED ROOT CAUSE)
+// ✅ YOUR CONFIG (FIXED STORAGE BUCKET)
 const firebaseConfig = {
-  apiKey: "AIzaSyBrtiWYAhVd4lx3gyY3RtJk0GEn7MotRJI",
-  authDomain: "shane-storage-90931.firebaseapp.com",
-  projectId: "shane-storage-90931",
-  
-  // ✅ THIS IS THE CRITICAL FIX
-  storageBucket: "shane-storage-90931.firebasestorage.app",
-
-  messagingSenderId: "321117848066",
-  appId: "1:321117848066:web:09e74895b8ecec3c475d1b",
+  apiKey: "AIzaSyCofVQ2vhydFPPxVyfkRMqA6_fqqMs9H1s",
+  authDomain: "shane-prayer-app-2026-f2a3e.firebaseapp.com",
+  projectId: "shane-prayer-app-2026-f2a3e",
+  storageBucket: "shane-prayer-app-2026-f2a3e.appspot.com", // 🔥 FIXED
+  messagingSenderId: "142736085758",
+  appId: "1:142736085758:web:d15c27b44d6972b5de4baf",
 };
 
-// Init app
+// 🔥 INIT APP
 const app = initializeApp(firebaseConfig);
 
-// Init storage (LOCKED TO CORRECT BUCKET)
+// ✅ EXPORT THESE (CRITICAL)
+export const auth = getAuth(app);
 export const storage = getStorage(app);
-
-export default app;

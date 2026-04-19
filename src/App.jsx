@@ -1,94 +1,147 @@
 import React, { useEffect, useState } from "react";
+import { auth } from "./firebase";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+
 import { loadPlaylist } from "./utils/loadPlaylist";
 import { usePrayerPlayer } from "./hooks/usePrayerPlayer";
-import { getSpiritualMode, modePlaylistMap } from "./core/spiritualMode";
 
 function App() {
   const [tracks, setTracks] = useState([]);
-  const [mode, setMode] = useState("");
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const {
     play,
     pause,
     next,
     prev,
+    playIndex,
     isPlaying,
     currentTrack,
-    setTracks: loadTracks, // IMPORTANT: hook alias fix
+    setTracks: loadTracks,
   } = usePrayerPlayer();
 
-  // -----------------------------
-  // INIT LOAD
-  // -----------------------------
+  // ---------------- AUTH ----------------
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u || null);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
+  // ---------------- LOAD ALL MUSIC ----------------
   useEffect(() => {
     const init = async () => {
       try {
-        const detectedMode = getSpiritualMode();
-        setMode(detectedMode);
+        // 🔥 LOAD MULTIPLE FOLDERS
+        const folders = ["aarti", "bhajan", "chalisa", "discourse"];
 
-        const folder = modePlaylistMap[detectedMode];
+        let allTracks = [];
 
-        console.log("📦 Loading folder:", folder);
+        for (let folder of folders) {
+          const data = await loadPlaylist(folder);
 
-        const data = await loadPlaylist(folder);
+          // add folder label for demo clarity
+          const tagged = data.map((t) => ({
+            ...t,
+            title: `${folder.toUpperCase()} - ${t.title}`,
+          }));
 
-        console.log("🎧 Tracks loaded:", data);
+          allTracks = [...allTracks, ...tagged];
+        }
 
-        setTracks(data);
-        loadTracks(data); // 🔥 correct hook call (NO load(), NO crash)
+        console.log("🔥 ALL TRACKS:", allTracks);
+
+        setTracks(allTracks);
+        loadTracks(allTracks);
       } catch (err) {
-        console.error("❌ Init error:", err);
+        console.error("Load error:", err);
       }
     };
 
     init();
   }, [loadTracks]);
 
-  // -----------------------------
-  // PLAY HANDLER
-  // -----------------------------
-  const handlePlay = (track) => {
-    if (!track?.url) return;
-    play(track);
-  };
-
   return (
-    <div style={styles.container}>
-      <h1>🕉 Prayer App - Spiritual Mode</h1>
+    <div style={{ padding: 20, textAlign: "center" }}>
+      <h1>🕉 Shane Prayer App</h1>
 
-      <h3>Mode: {mode}</h3>
+      {/* LOGIN */}
+      <div style={{ marginBottom: 20 }}>
+        {user ? (
+          <>
+            👤 {user.email}
+            <br />
+            <button onClick={handleLogout}>Logout</button>
+          </>
+        ) : (
+          <>
+            <input
+              placeholder="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button onClick={handleLogin}>Login</button>
+          </>
+        )}
+      </div>
 
       {/* NOW PLAYING */}
       {currentTrack && (
-        <div style={styles.nowPlaying}>
-          🎧 Now Playing: {currentTrack.title}
-        </div>
+        <h3>🎧 Now Playing: {currentTrack.title}</h3>
       )}
 
       {/* CONTROLS */}
-      <div style={styles.controls}>
+      <div style={{ margin: 10 }}>
         <button onClick={prev}>⏮ Prev</button>
 
         {isPlaying ? (
           <button onClick={pause}>⏸ Pause</button>
         ) : (
-          <button onClick={() => tracks[0] && handlePlay(tracks[0])}>
-            ▶ Play
-          </button>
+          <button onClick={play}>▶ Play</button>
         )}
 
         <button onClick={next}>⏭ Next</button>
       </div>
 
       {/* TRACK LIST */}
-      <div style={styles.list}>
-        {tracks.length === 0 && <p>Loading prayers...</p>}
+      <div>
+        {tracks.length === 0 && <p>Loading...</p>}
 
         {tracks.map((t, i) => (
           <div
             key={i}
-            style={styles.item}
-            onClick={() => handlePlay(t)}
+            onClick={() => playIndex(i)}
+            style={{
+              padding: 10,
+              margin: 5,
+              cursor: "pointer",
+              background: "#fff",
+              borderRadius: 8,
+            }}
           >
             🪔 {t.title}
           </div>
@@ -97,41 +150,5 @@ function App() {
     </div>
   );
 }
-
-// -----------------------------
-// STYLES
-// -----------------------------
-const styles = {
-  container: {
-    textAlign: "center",
-    padding: 30,
-    fontFamily: "Arial",
-    background: "#f7f3ea",
-    minHeight: "100vh",
-  },
-  nowPlaying: {
-    margin: 15,
-    fontSize: 18,
-    color: "#333",
-    fontWeight: "bold",
-  },
-  controls: {
-    margin: 20,
-    display: "flex",
-    justifyContent: "center",
-    gap: 10,
-  },
-  list: {
-    marginTop: 20,
-  },
-  item: {
-    padding: 12,
-    margin: 8,
-    background: "white",
-    borderRadius: 10,
-    cursor: "pointer",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-  },
-};
 
 export default App;

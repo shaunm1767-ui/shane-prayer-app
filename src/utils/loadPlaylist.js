@@ -1,18 +1,30 @@
-export const loadPlaylist = (folder) => {
-  console.log("📦 Loading static playlist:", folder);
+// src/utils/loadPlaylist.js
 
-  if (folder === "aarti") {
-    return [
-      {
-        title: "Jai Ambe Gauri",
-        url: "https://firebasestorage.googleapis.com/v0/b/shane-storage-90931.firebasestorage.app/o/aarti%2Fshane_Jaiambegauri_arthi.mp3?alt=media&token=423af3bb-a31d-483b-81f7-dc1123d1a5ca"
-      },
-      {
-        title: "Hanuman Aarti",
-        url: "https://firebasestorage.googleapis.com/v0/b/shane-storage-90931.firebasestorage.app/o/aarti%2Fshane_hanuman_arthi.mp3?alt=media&token=b1d354d8-5254-448c-a2fd-23a626ab8b91"
-      }
-    ];
+import { ref, listAll, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
+
+export default async function loadPlaylist(folder = "aarti") {
+  try {
+    console.log("📦 SAFE FIREBASE LOAD:", folder);
+
+    const folderRef = ref(storage, `${folder}/`);
+    const result = await listAll(folderRef);
+
+    const tracks = await Promise.all(
+      result.items.map(async (item) => {
+        const url = await getDownloadURL(item);
+
+        return {
+          name: item.name.replace(".mp3", ""),
+          url,
+        };
+      })
+    );
+
+    console.log("🎧 TRACKS LOADED:", tracks);
+    return tracks;
+  } catch (err) {
+    console.error("❌ Playlist load failed:", err);
+    return [];
   }
-
-  return [];
-};
+}

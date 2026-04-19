@@ -1,154 +1,111 @@
-import React, { useEffect, useState } from "react";
+// src/App.jsx
+
+import { useEffect, useRef, useState } from "react";
 import { auth } from "./firebase";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import loadPlaylist from "./utils/loadPlaylist";
 
-import { loadPlaylist } from "./utils/loadPlaylist";
-import { usePrayerPlayer } from "./hooks/usePrayerPlayer";
-
-function App() {
-  const [tracks, setTracks] = useState([]);
+export default function App() {
+  const audioRef = useRef(new Audio());
   const [user, setUser] = useState(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [tracks, setTracks] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [folder, setFolder] = useState("aarti");
 
-  const {
-    play,
-    pause,
-    next,
-    prev,
-    playIndex,
-    isPlaying,
-    currentTrack,
-    setTracks: loadTracks,
-  } = usePrayerPlayer();
-
-  // ---------------- AUTH ----------------
+  // AUTH
   useEffect(() => {
+    console.log("🔐 Firebase auth init...");
+
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u || null);
+      console.log("🔐 Auth state:", u);
     });
+
     return () => unsub();
   }, []);
 
-  const handleLogin = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
-
-  // ---------------- LOAD ALL MUSIC ----------------
+  // LOAD MUSIC
   useEffect(() => {
-    const init = async () => {
-      try {
-        // 🔥 LOAD MULTIPLE FOLDERS
-        const folders = ["aarti", "bhajan", "chalisa", "discourse"];
+    async function load() {
+      console.log("📦 Loading mode:", folder);
+      const data = await loadPlaylist(folder);
+      setTracks(data);
+      setCurrentIndex(0);
+    }
 
-        let allTracks = [];
+    load();
+  }, [folder]);
 
-        for (let folder of folders) {
-          const data = await loadPlaylist(folder);
+  // PLAY TRACK
+  const play = (index) => {
+    if (!tracks.length) return;
 
-          // add folder label for demo clarity
-          const tagged = data.map((t) => ({
-            ...t,
-            title: `${folder.toUpperCase()} - ${t.title}`,
-          }));
+    const track = tracks[index];
+    if (!track) return;
 
-          allTracks = [...allTracks, ...tagged];
-        }
+    console.log("🎧 PLAYING:", track.name);
 
-        console.log("🔥 ALL TRACKS:", allTracks);
+    audioRef.current.pause();
+    audioRef.current.src = track.url;
+    audioRef.current.load();
 
-        setTracks(allTracks);
-        loadTracks(allTracks);
-      } catch (err) {
-        console.error("Load error:", err);
-      }
-    };
+    audioRef.current
+      .play()
+      .catch((err) => console.error("❌ PLAY ERROR:", err));
 
-    init();
-  }, [loadTracks]);
+    setCurrentIndex(index);
+  };
+
+  const next = () => {
+    const i = (currentIndex + 1) % tracks.length;
+    play(i);
+  };
+
+  const prev = () => {
+    const i = (currentIndex - 1 + tracks.length) % tracks.length;
+    play(i);
+  };
 
   return (
-    <div style={{ padding: 20, textAlign: "center" }}>
-      <h1>🕉 Shane Prayer App</h1>
+    <div style={{ padding: 30, fontFamily: "Arial" }}>
+      <h2>🕉 Prayer App</h2>
 
-      {/* LOGIN */}
-      <div style={{ marginBottom: 20 }}>
+      {/* USER */}
+      <div>
         {user ? (
           <>
             👤 {user.email}
-            <br />
-            <button onClick={handleLogout}>Logout</button>
+            <button onClick={() => signOut(auth)}>Logout</button>
           </>
         ) : (
-          <>
-            <input
-              placeholder="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button onClick={handleLogin}>Login</button>
-          </>
+          <p>Not logged in</p>
         )}
       </div>
 
-      {/* NOW PLAYING */}
-      {currentTrack && (
-        <h3>🎧 Now Playing: {currentTrack.title}</h3>
-      )}
-
-      {/* CONTROLS */}
-      <div style={{ margin: 10 }}>
-        <button onClick={prev}>⏮ Prev</button>
-
-        {isPlaying ? (
-          <button onClick={pause}>⏸ Pause</button>
-        ) : (
-          <button onClick={play}>▶ Play</button>
-        )}
-
-        <button onClick={next}>⏭ Next</button>
-      </div>
-
-      {/* TRACK LIST */}
-      <div>
-        {tracks.length === 0 && <p>Loading...</p>}
-
-        {tracks.map((t, i) => (
-          <div
-            key={i}
-            onClick={() => playIndex(i)}
-            style={{
-              padding: 10,
-              margin: 5,
-              cursor: "pointer",
-              background: "#fff",
-              borderRadius: 8,
-            }}
-          >
-            🪔 {t.title}
-          </div>
+      {/* MODE SWITCH */}
+      <div style={{ marginTop: 10 }}>
+        {["aarti", "bhajan", "chalisa", "discourse"].map((m) => (
+          <button key={m} onClick={() => setFolder(m)}>
+            {m}
+          </button>
         ))}
       </div>
+
+      {/* PLAYER */}
+      <h3 style={{ marginTop: 20 }}>🎧 Now Playing</h3>
+      <p>{tracks[currentIndex]?.name || "No track loaded"}</p>
+
+      <button onClick={prev}>⏮ Prev</button>
+      <button onClick={() => play(currentIndex)}>▶ Play</button>
+      <button onClick={next}>⏭ Next</button>
+
+      {/* PLAYLIST */}
+      <h4 style={{ marginTop: 20 }}>🪔 Playlist</h4>
+      {tracks.map((t, i) => (
+        <div key={i}>
+          <button onClick={() => play(i)}>{t.name}</button>
+        </div>
+      ))}
     </div>
   );
 }
-
-export default App;

@@ -1,18 +1,52 @@
 {
   "aarti": [
+    "shane_Jaiambegauri_arthi.mp3",
     "shane_hanuman_arthi.mp3",
     "shane_luxmi_arthi.mp3",
-    "shane_Jaiambegauri_arthi.mp3"
+    "shane_shiv_arthi.mp3",
+    "shane_saraswathi_arthi.mp3",
+    "shane_ganesh_openingprayer.mp3",
+    "shane_uniserval_arthi.mp3"
   ],
+
   "bhajan": [
+    "shane_krishna_bhajan.mp3",
+    "shane_krishna_bhajan4.mp3",
+    "shane_krishna_bahajan7.mp3",
+    "shane_ram_bhajan.mp3",
+    "shane_ram_bhajan12.mp3",
     "shane_hanuman_bhajan.mp3",
-    "shane_krishna_bhajan.mp3"
+    "shane_vishnu_bhajan.mp3",
+    "shane_gurucharanan_bhajan.mp3",
+    "shane_jaishreeram_bahajan.mp3",
+    "shane_satsang1_bhajan.mp3",
+    "shane_mother_bhajan.mp3",
+    "shane_mother_bhajan1.mp3",
+    "shane_mother_bhajan3.mp3",
+    "shane_mother_bhajan5.mp3",
+    "shane_mother_bhajan8.mp3",
+    "shane_mother_bhajan9.mp3",
+    "shane_nahichaiiye_bhajan.mp3"
   ],
+
   "chalisa": [
     "shane_hanuman_chalisa.mp3",
-    "shane_ganesh_chalisa.mp3"
+    "shane_ganesh_chalisa.mp3",
+    "shane_durga_chalisa.mp3",
+    "shane_luxmi_chalisa.mp3",
+    "shane_saraswathie_chalisa.mp3",
+    "shane_mother_bandi_chalisa.mp3"
   ],
+
   "discourse": [
-    "shane_discourse.mp3"
+    "shane_discourse.mp3",
+    "shane_discourse1.mp3",
+    "shane_discourse2.mp3",
+    "shane_discourse3.mp3",
+    "shane_discourse4.mp3",
+    "shane_discourse5.mp3",
+    "shane_discourse6.mp3",
+    "shane_discourse7.mp3",
+    "shane_satsang.mp4"
   ]
 }

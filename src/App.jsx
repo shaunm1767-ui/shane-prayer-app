@@ -1,175 +1,163 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth, storage } from "./firebase";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut
-} from "firebase/auth";
-import { ref, getDownloadURL } from "firebase/storage";
+import { ref, listAll, getDownloadURL } from "firebase/storage";
 
 export default function App() {
   const [user, setUser] = useState(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [tracks, setTracks] = useState([]);
-  const [current, setCurrent] = useState(0);
   const [mode, setMode] = useState("aarti");
+  const [tracks, setTracks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
 
-  // 🔐 AUTH
+  // 🔐 AUTH LISTENER
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      console.log("🔐 Auth state:", u);
       setUser(u);
     });
+
+    return () => unsub();
   }, []);
 
-  // 🎧 LOAD TRACKS
+  // 🎧 LOAD FIREBASE TRACKS (FULL LIBRARY MODE)
   useEffect(() => {
     if (!user) return;
 
     async function loadTracks() {
-      const res = await fetch("/audio-index.json");
-      const data = await res.json();
+      try {
+        setLoading(true);
+        console.log("📦 Loading folder:", mode);
 
-      const files = data[mode] || [];
+        const folderRef = ref(storage, `${mode}/`);
+        const res = await listAll(folderRef);
 
-      const trackObjects = await Promise.all(
-        files.map(async (file) => {
-          const url = await getDownloadURL(ref(storage, `${mode}/${file}`));
-          return {
-            name: file,
-            url: url
-          };
-        })
-      );
+        const trackList = await Promise.all(
+          res.items.map(async (item) => {
+            const url = await getDownloadURL(item);
+            return {
+              name: item.name,
+              url
+            };
+          })
+        );
 
-      setTracks(trackObjects);
-      setCurrent(0);
+        console.log("🎧 TRACKS LOADED:", trackList);
+
+        setTracks(trackList);
+
+        // auto set first track
+        if (trackList.length > 0) {
+          setCurrentTrack(trackList[0]);
+        }
+
+      } catch (err) {
+        console.error("❌ Error loading tracks:", err);
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadTracks();
   }, [mode, user]);
 
-  // 🔐 LOGIN SCREEN
+  // 🔁 PLAY NEXT
+  const playNext = () => {
+    const index = tracks.findIndex(t => t.url === currentTrack?.url);
+    const next = tracks[index + 1] || tracks[0];
+    setCurrentTrack(next);
+  };
+
+  // 🔁 PLAY PREV
+  const playPrev = () => {
+    const index = tracks.findIndex(t => t.url === currentTrack?.url);
+    const prev = tracks[index - 1] || tracks[tracks.length - 1];
+    setCurrentTrack(prev);
+  };
+
+  // 🔐 LOGIN STATE
   if (!user) {
     return (
-      <div style={{ padding: 30 }}>
-        <h2>🔐 Login / Signup</h2>
-
-        <input
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-        /><br /><br />
-
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        /><br /><br />
-
-        <button onClick={() =>
-          createUserWithEmailAndPassword(auth, email, password)
-        }>Sign Up</button>
-
-        <button onClick={() =>
-          signInWithEmailAndPassword(auth, email, password)
-        }>Login</button>
+      <div style={{ padding: 20 }}>
+        <h2>🔐 Please login to continue</h2>
       </div>
     );
   }
 
-  const btnStyle = {
-    padding: "10px 15px",
-    margin: "5px",
-    border: "none",
-    borderRadius: "8px",
-    background: "#f1c45b",
-    fontWeight: "bold",
-    cursor: "pointer"
-  };
-
   return (
-    <div style={{
-      padding: 20,
-      minHeight: "100vh",
-      background: "linear-gradient(180deg,#dbeefe,#c7e2f5)",
-      fontFamily: "Arial"
-    }}>
+    <div style={{ padding: 20, fontFamily: "Arial" }}>
 
       <h2>🕉 Prayer App</h2>
-
       <p>👤 {user.email}</p>
-      <button style={btnStyle} onClick={() => signOut(auth)}>Logout</button>
 
-      <hr />
-
-      {/* MODE */}
-      <div>
-        <button style={btnStyle} onClick={() => setMode("aarti")}>Aarti</button>
-        <button style={btnStyle} onClick={() => setMode("bhajan")}>Bhajan</button>
-        <button style={btnStyle} onClick={() => setMode("chalisa")}>Chalisa</button>
-        <button style={btnStyle} onClick={() => setMode("discourse")}>Discourse</button>
+      {/* MODE SWITCH */}
+      <div style={{ marginBottom: 10 }}>
+        {["aarti", "bhajan", "chalisa", "discourse"].map((m) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            style={{
+              marginRight: 8,
+              padding: 8,
+              background: mode === m ? "#4caf50" : "#ddd"
+            }}
+          >
+            {m}
+          </button>
+        ))}
       </div>
 
-      {/* PLAYER */}
-      <div style={{ marginTop: 20 }}>
-        <h3>🎧 Now Playing</h3>
+      {/* LOADING */}
+      {loading && <p>⏳ Loading tracks...</p>}
 
-        {tracks.length > 0 ? (
+      {/* CURRENT TRACK */}
+      <div>
+        <h3>🎧 Now Playing</h3>
+        {currentTrack ? (
           <>
+            <p>{currentTrack.name}</p>
             <audio
               controls
-              src={tracks[current]?.url}
               autoPlay
-              onEnded={() =>
-                setCurrent((prev) => (prev + 1) % tracks.length)
-              }
+              src={currentTrack.url}
+              onEnded={playNext}
+              style={{ width: "100%" }}
             />
-
-            <p style={{ fontWeight: "bold" }}>
-              Now Playing: {tracks[current]?.name.replace(".mp3", "").replaceAll("_", " ")}
-            </p>
-
-            <p>Track {current + 1} of {tracks.length}</p>
-
-            {/* PLAYLIST */}
-            <div style={{ marginTop: 20 }}>
-              <h4>🪔 Playlist</h4>
-
-              {tracks.map((t, i) => (
-                <div
-                  key={i}
-                  onClick={() => setCurrent(i)}
-                  style={{
-                    padding: 10,
-                    marginBottom: 5,
-                    borderRadius: 6,
-                    cursor: "pointer",
-                    background: i === current ? "#ffd166" : "#ffffff"
-                  }}
-                >
-                  🎵 {t.name.replace(".mp3", "").replaceAll("_", " ")}
-                </div>
-              ))}
-            </div>
-
-            {/* CONTROLS */}
-            <div style={{ marginTop: 15 }}>
-              <button style={btnStyle} onClick={() =>
-                setCurrent((prev) => (prev - 1 + tracks.length) % tracks.length)
-              }>⏮ Prev</button>
-
-              <button style={btnStyle} onClick={() =>
-                setCurrent((prev) => (prev + 1) % tracks.length)
-              }>⏭ Next</button>
-            </div>
-
           </>
         ) : (
           <p>No track loaded</p>
         )}
       </div>
+
+      {/* PLAYER CONTROLS */}
+      <div style={{ marginTop: 10 }}>
+        <button onClick={playPrev}>⏮ Prev</button>
+        <button onClick={playNext}>⏭ Next</button>
+      </div>
+
+      {/* PLAYLIST */}
+      <div style={{ marginTop: 20 }}>
+        <h3>🪔 Playlist</h3>
+
+        {tracks.length === 0 && !loading && (
+          <p>⚠️ No tracks found in Firebase folder: {mode}</p>
+        )}
+
+        {tracks.map((t, i) => (
+          <div
+            key={i}
+            onClick={() => setCurrentTrack(t)}
+            style={{
+              padding: 8,
+              cursor: "pointer",
+              background: currentTrack?.url === t.url ? "#e0f7fa" : "transparent"
+            }}
+          >
+            🎵 {t.name}
+          </div>
+        ))}
+      </div>
+
     </div>
   );
 }

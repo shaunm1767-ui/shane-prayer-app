@@ -76,13 +76,59 @@ export default function App() {
   };
 
   // 🔐 LOGIN STATE
-  if (!user) {
-    return (
-      <div style={{ padding: 20 }}>
-        <h2>🔐 Please login to continue</h2>
-      </div>
-    );
-  }
+ if (!user) {
+  return (
+    <div style={{
+      padding: 20,
+      fontFamily: "Arial",
+      display: "flex",
+      flexDirection: "column",
+      gap: 10,
+      maxWidth: 300,
+      margin: "0 auto",
+      marginTop: 80
+    }}>
+      <h2>🔐 Please login to continue</h2>
+
+      <input id="email" placeholder="Email" style={{ padding: 10 }} />
+      <input id="password" type="password" placeholder="Password" style={{ padding: 10 }} />
+
+      <button
+        onClick={async () => {
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            const { signInWithEmailAndPassword } = await import("firebase/auth");
+            await signInWithEmailAndPassword(auth, email, password);
+          } catch (e) {
+            alert(e.message);
+          }
+        }}
+        style={{ padding: 10, background: "green", color: "white" }}
+      >
+        Login
+      </button>
+
+      <button
+        onClick={async () => {
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            const { createUserWithEmailAndPassword } = await import("firebase/auth");
+            await createUserWithEmailAndPassword(auth, email, password);
+          } catch (e) {
+            alert(e.message);
+          }
+        }}
+        style={{ padding: 10, background: "blue", color: "white" }}
+      >
+        Sign Up
+      </button>
+    </div>
+  );
+}
 
   return (
     <div style={{ padding: 20, fontFamily: "Arial" }}>

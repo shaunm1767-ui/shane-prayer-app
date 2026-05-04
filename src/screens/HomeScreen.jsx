@@ -1,60 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import audioEngine from "../audioEngine.js";
 
 export default function HomeScreen() {
-  console.log("HOME SCREEN LOADED");
+  const [hasSession, setHasSession] = useState(false);
 
-  const handlePlay = () => {
-    console.log("CLICKED PLAY");
+  useEffect(() => {
+    const lastTrack = localStorage.getItem("lastTrack");
 
-    // safe default track (adjust later if dynamic)
+    if (lastTrack) {
+      setHasSession(true);
+      audioEngine.resumeLast();
+    }
+  }, []);
+
+  const play = () => {
     audioEngine.play("/audio/track1.mp3");
+    setHasSession(true);
   };
 
-  const handlePause = () => {
-    console.log("CLICKED PAUSE");
+  const pause = () => {
     audioEngine.pause();
   };
 
-  return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>HOME</h1>
+  const clear = () => {
+    localStorage.removeItem("lastTrack");
+    localStorage.removeItem("lastTime");
+    setHasSession(false);
+  };
 
-      <p style={styles.subtitle}>
-        Welcome back — Continue Listening
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>HOME</h1>
+
+      <p style={{ marginBottom: 20 }}>
+        {hasSession ? "Continue Listening Available" : "No Previous Session"}
       </p>
 
-      <button style={styles.playButton} onClick={handlePlay}>
-        ▶ Play Audio
-      </button>
-
-      <button style={styles.pauseButton} onClick={handlePause}>
-        ⏸ Pause
-      </button>
+      <div style={{ display: "flex", gap: 10 }}>
+        <button onClick={play}>▶ Play</button>
+        <button onClick={pause}>⏸ Pause</button>
+        <button onClick={clear}>🗑 Clear</button>
+      </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: 20,
-    fontFamily: "Arial",
-  },
-  title: {
-    fontSize: 28,
-    marginBottom: 10,
-  },
-  subtitle: {
-    marginBottom: 20,
-    color: "#666",
-  },
-  playButton: {
-    padding: 10,
-    marginRight: 10,
-    cursor: "pointer",
-  },
-  pauseButton: {
-    padding: 10,
-    cursor: "pointer",
-  },
-};

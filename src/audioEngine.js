@@ -1,53 +1,66 @@
 class AudioEngine {
   constructor() {
-    if (!AudioEngine.instance) {
-      this.audio = new Audio(); // single audio instance
-      this.isPlaying = false;
-      this.currentTrack = null;
-      this.isSwitching = false;
+    this.audio = new Audio();
+    this.currentTrack = null;
 
-      AudioEngine.instance = this;
-    }
+    this.isPlaying = false;
+    this.lock = false;
 
-    return AudioEngine.instance;
-  }
-
-  load(src) {
-    this.audio.src = src;
-    this.audio.load();
+    this.lastPlayTime = 0;
   }
 
   async play(src) {
     try {
+      const now = Date.now();
+
+      // 🛑 debounce rapid clicks
+      if (now - this.lastPlayTime < 300) {
+        console.log("IGNORED: too fast");
+        return;
+      }
+
+      // 🛑 prevent overlap
+      if (this.lock) {
+        console.log("IGNORED: locked");
+        return;
+      }
+
+      this.lock = true;
+      this.lastPlayTime = now;
+
       console.log("ENGINE: play called", src);
 
-      // stop collisions
-      if (this.isSwitching) return;
-
-      this.isSwitching = true;
-
-      // if new track → reset
-      if (src && this.currentTrack !== src) {
-        this.audio.pause();
-        this.load(src);
-        this.currentTrack = src;
+      if (src) {
+        if (this.currentTrack !== src) {
+          this.audio.pause();
+          this.audio.src = src;
+          this.currentTrack = src;
+        }
       }
 
       await this.audio.play();
 
       this.isPlaying = true;
-      this.isSwitching = false;
+      this.lock = false;
+
+      // 💾 SAVE CONTINUE LISTENING STATE
+      localStorage.setItem("lastTrack", this.currentTrack);
+      localStorage.setItem("lastTime", this.audio.currentTime);
 
     } catch (err) {
       console.log("ENGINE ERROR:", err);
-      this.isSwitching = false;
+      this.lock = false;
     }
   }
 
   pause() {
-    console.log("ENGINE: pause");
     this.audio.pause();
     this.isPlaying = false;
+    this.lock = false;
+
+    // save position
+    localStorage.setItem("lastTrack", this.currentTrack);
+    localStorage.setItem("lastTime", this.audio.currentTime);
   }
 
   stop() {
@@ -55,10 +68,25 @@ class AudioEngine {
     this.audio.currentTime = 0;
     this.isPlaying = false;
   }
+
+  resumeLast() {
+    const lastTrack = localStorage.getItem("lastTrack");
+    const lastTime = localStorage.getItem("lastTime");
+
+    if (lastTrack) {
+      console.log("RESUMING:", lastTrack);
+
+      this.audio.src = lastTrack;
+      this.audio.currentTime = parseFloat(lastTime || 0);
+
+      this.audio.play().catch(err => {
+        console.log("Resume failed:", err);
+      });
+
+      this.isPlaying = true;
+    }
+  }
 }
 
-// singleton lock (important)
-const instance = new AudioEngine();
-
-
-export default instance;
+const audioEngine = new AudioEngine();
+export default audioEngine;

@@ -1,41 +1,50 @@
 class AudioEngine {
   constructor() {
     this.audio = new Audio();
+
     this.currentTrack = null;
-
     this.isPlaying = false;
-    this.lock = false;
 
+    this.queue = [];
+    this.currentIndex = -1;
+
+    this.lock = false;
     this.lastPlayTime = 0;
+
+    this.progressInterval = null;
+
+    // bind events once
+    this.audio.onended = () => this.next();
   }
 
-  async play(src) {
+  // =========================
+  // ▶ PLAY
+  // =========================
+  async play(src = null) {
     try {
       const now = Date.now();
 
-      // 🛑 debounce rapid clicks
-      if (now - this.lastPlayTime < 300) {
-        console.log("IGNORED: too fast");
-        return;
-      }
-
-      // 🛑 prevent overlap
-      if (this.lock) {
-        console.log("IGNORED: locked");
-        return;
-      }
+      if (now - this.lastPlayTime < 250) return;
+      if (this.lock) return;
 
       this.lock = true;
       this.lastPlayTime = now;
 
-      console.log("ENGINE: play called", src);
+      if (!src && this.queue.length > 0) {
+        src = this.queue[this.currentIndex];
+      }
 
-      if (src) {
-        if (this.currentTrack !== src) {
-          this.audio.pause();
-          this.audio.src = src;
-          this.currentTrack = src;
-        }
+      if (!src) {
+        this.lock = false;
+        return;
+      }
+
+      console.log("ENGINE PLAY:", src);
+
+      if (this.currentTrack !== src) {
+        this.audio.pause();
+        this.audio.src = src;
+        this.currentTrack = src;
       }
 
       await this.audio.play();
@@ -43,9 +52,7 @@ class AudioEngine {
       this.isPlaying = true;
       this.lock = false;
 
-      // 💾 SAVE CONTINUE LISTENING STATE
-      localStorage.setItem("lastTrack", this.currentTrack);
-      localStorage.setItem("lastTime", this.audio.currentTime);
+      this.startProgressTracking();
 
     } catch (err) {
       console.log("ENGINE ERROR:", err);
@@ -53,38 +60,125 @@ class AudioEngine {
     }
   }
 
+  // =========================
+  // ⏸ PAUSE
+  // =========================
   pause() {
     this.audio.pause();
     this.isPlaying = false;
-    this.lock = false;
 
-    // save position
-    localStorage.setItem("lastTrack", this.currentTrack);
-    localStorage.setItem("lastTime", this.audio.currentTime);
+    this.stopProgressTracking();
+    this.saveProgress();
   }
 
-  stop() {
-    this.audio.pause();
-    this.audio.currentTime = 0;
-    this.isPlaying = false;
+  // =========================
+  // ⏭ NEXT
+  // =========================
+  next() {
+    if (!this.queue.length) return;
+
+    if (this.currentIndex < this.queue.length - 1) {
+      this.currentIndex++;
+      this.play(this.queue[this.currentIndex]);
+    }
   }
 
+  // =========================
+  // ⏮ PREVIOUS
+  // =========================
+  previous() {
+    if (!this.queue.length) return;
+
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      this.play(this.queue[this.currentIndex]);
+    }
+  }
+
+  // =========================
+  // 🎧 LOAD PLAYLIST
+  // =========================
+  loadQueue(queue, index = 0) {
+    this.queue = queue || [];
+    this.currentIndex = index;
+
+    localStorage.setItem("playlist", JSON.stringify(this.queue));
+    localStorage.setItem("currentIndex", this.currentIndex);
+  }
+
+  // =========================
+  // 🔄 RESUME SESSION (SAFE)
+  // =========================
   resumeLast() {
     const lastTrack = localStorage.getItem("lastTrack");
     const lastTime = localStorage.getItem("lastTime");
 
-    if (lastTrack) {
-      console.log("RESUMING:", lastTrack);
+    const savedQueue = localStorage.getItem("playlist");
+    const savedIndex = localStorage.getItem("currentIndex");
 
-      this.audio.src = lastTrack;
-      this.audio.currentTime = parseFloat(lastTime || 0);
-
-      this.audio.play().catch(err => {
-        console.log("Resume failed:", err);
-      });
-
-      this.isPlaying = true;
+    if (savedQueue) {
+      this.queue = JSON.parse(savedQueue);
+      this.currentIndex = parseInt(savedIndex || 0);
     }
+
+    if (!lastTrack) return;
+
+    console.log("RESUME READY:", lastTrack);
+
+    this.currentTrack = lastTrack;
+    this.audio.src = lastTrack;
+
+    this.audio.onloadedmetadata = () => {
+      this.audio.currentTime = parseFloat(lastTime || 0);
+      this.isPlaying = false;
+
+      console.log("READY FOR USER PLAY");
+    };
+  }
+
+  // =========================
+  // 💾 SAVE PROGRESS
+  // =========================
+  saveProgress() {
+    if (!this.currentTrack) return;
+
+    localStorage.setItem("lastTrack", this.currentTrack);
+    localStorage.setItem("lastTime", this.audio.currentTime);
+    localStorage.setItem("playlist", JSON.stringify(this.queue));
+    localStorage.setItem("currentIndex", this.currentIndex);
+  }
+
+  // =========================
+  // 📊 PROGRESS TRACKING
+  // =========================
+  startProgressTracking() {
+    this.stopProgressTracking();
+
+    this.progressInterval = setInterval(() => {
+      if (!this.audio || this.audio.paused) return;
+
+      this.saveProgress();
+
+      console.log(
+        "PROGRESS:",
+        this.currentTrack,
+        this.audio.currentTime.toFixed(1)
+      );
+    }, 2000);
+  }
+
+  stopProgressTracking() {
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
+    }
+  }
+
+  // =========================
+  // 🔍 HELPERS
+  // =========================
+  getCurrentTrack() {
+    return this.queue[this.currentIndex] || this.currentTrack;
   }
 }
 

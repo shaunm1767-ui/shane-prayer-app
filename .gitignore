@@ -1,4 +1,9 @@
-# dependencies
+
+# Large assets
+build/
+*.zip
+*.mp3
+shanepics/# dependencies
 node_modules/
 
 # build output (VERY IMPORTANT)

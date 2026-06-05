@@ -1,0 +1,22 @@
+﻿FIREBASE UPLOAD STRUCTURE (OPTION A)
+
+Upload your audio files like this:
+
+/aarti/
+/bhajan/
+/chalisa/
+/discourse/
+
+Example:
+
+aarti/ganesh_aarti.mp3
+bhajan/hare_ram.mp3
+chalisa/hanuman_chalisa.mp3
+discourse/spiritual_talk_01.mp3
+
+RULE:
+- No files in root
+- Every file must belong to a category folder
+- Keep names lowercase + underscores only
+
+This ensures clean playlist filtering later.

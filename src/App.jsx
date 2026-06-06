@@ -1,15 +1,15 @@
 import React, { useContext } from "react";
-import Login from "./Login";
-import Home from "./Home";
+import Login from "./screens/Login";
+import HomeScreen from "./screens/HomeScreen";
+import Player from "./screens/Player";
 import { AuthContext } from "./AuthProvider";
 
 export default function App() {
   const { user } = useContext(AuthContext);
 
-  // 🔥 HARD RULE: no user = login only
-  if (!user) {
-    return <Login />;
-  }
+  // 1. NOT LOGGED IN → LOGIN ONLY
+  if (!user) return <Login />;
 
-  return <Home />;
+  // 2. LOGGED IN → MAIN APP FLOW
+  return <HomeScreen />;
 }

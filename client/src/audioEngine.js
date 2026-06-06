@@ -3,62 +3,85 @@ class AudioEngine {
     this.audio = new Audio();
 
     this.queue = [];
-    this.currentIndex = -1;
+    this.currentIndex = 0;
 
-    this.currentTrack = null;
     this.isPlaying = false;
+    this.currentTrack = null;
 
-    this.lock = false;
+    this._isSwitching = false;
+    this._endedLock = false;
 
     this.onIndexChange = null;
 
     this.audio.onended = () => {
-      console.log("TRACK ENDED");
-      this.next();
+      if (this._endedLock) return;
+
+      this._endedLock = true;
+
+      setTimeout(() => {
+        this.next();
+        this._endedLock = false;
+      }, 100);
     };
   }
 
   init() {
-    console.log("AudioEngine initialized (user unlocked audio)");
+    console.log("AudioEngine initialized");
   }
 
-  loadQueue(queue, index = 0) {
-    this.queue = queue || [];
+  setPlaylist(list) {
+    this.queue = list || [];
+    this.currentIndex = 0;
+    this.emit();
+  }
+
+  emit() {
+    if (this.onIndexChange) {
+      this.onIndexChange(this.currentIndex);
+    }
+  }
+
+  playIndex(index) {
+    if (this._isSwitching) return;
+
+    if (!this.queue.length) return;
+    if (index < 0 || index >= this.queue.length) return;
+
+    this._isSwitching = true;
+
     this.currentIndex = index;
+    const track = this.queue[this.currentIndex];
+
+    this.emit();
+    this.play(track.src);
+
+    setTimeout(() => {
+      this._isSwitching = false;
+    }, 150);
   }
 
-  play(src = null) {
-    if (this.lock) return;
-
-    this.lock = true;
-
-    if (!src && this.queue.length > 0) {
-      src = this.queue[this.currentIndex];
-    }
-
-    if (!src) {
-      this.lock = false;
-      return;
-    }
+  play(src) {
+    if (!src) return;
 
     console.log("ENGINE PLAY:", src);
 
-    if (this.currentTrack !== src) {
-      this.audio.pause();
+    this.audio.pause();
+    this.audio.currentTime = 0;
+    this.audio.src = "";
+    this.audio.load();
+
+    setTimeout(() => {
       this.audio.src = src;
       this.audio.load();
-      this.currentTrack = src;
-    }
 
-    this.audio.play()
-      .then(() => {
-        this.isPlaying = true;
-        this.lock = false;
-      })
-      .catch((err) => {
-        console.log("ENGINE ERROR:", err);
-        this.lock = false;
-      });
+      this.audio.play()
+        .then(() => {
+          this.isPlaying = true;
+        })
+        .catch(err => {
+          console.log("PLAY ERROR:", err);
+        });
+    }, 50);
   }
 
   pause() {
@@ -67,43 +90,17 @@ class AudioEngine {
   }
 
   next() {
-    if (!this.queue.length) return;
-
-    if (this.currentIndex < this.queue.length - 1) {
-      this.currentIndex++;
-
-      const nextTrack = this.queue[this.currentIndex];
-
-      if (this.onIndexChange) {
-        this.onIndexChange(this.currentIndex);
-      }
-
-      setTimeout(() => {
-        this.play(nextTrack);
-      }, 150);
-    }
+    this.playIndex(this.currentIndex + 1);
   }
 
   previous() {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-
-      const prevTrack = this.queue[this.currentIndex];
-
-      if (this.onIndexChange) {
-        this.onIndexChange(this.currentIndex);
-      }
-
-      setTimeout(() => {
-        this.play(prevTrack);
-      }, 150);
-    }
+    this.playIndex(this.currentIndex - 1);
   }
 
   clear() {
     this.pause();
     this.queue = [];
-    this.currentIndex = -1;
+    this.currentIndex = 0;
     this.currentTrack = null;
   }
 }

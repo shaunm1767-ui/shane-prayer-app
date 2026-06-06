@@ -1,15 +1,28 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import audioEngine from "./audioEngine";
+import { playlist } from "./playlist";
 
 export default function Home() {
-  const navigate = useNavigate();
+  useEffect(() => {
+    audioEngine.setPlaylist(playlist);
+  }, []);
 
   return (
     <div style={{ padding: 20 }}>
-      <h1>🙏 Home Dashboard</h1>
+      <h1>🙏 Shane Prayer App</h1>
 
-      <button onClick={() => navigate("/player")}>
-        Go to Player
+      <p>Playlist Ready</p>
+
+      <button onClick={() => audioEngine.playIndex(0)}>
+        ▶ Play Track 1
+      </button>
+
+      <button onClick={() => audioEngine.previous()}>
+        ⏮ Prev
+      </button>
+
+      <button onClick={() => audioEngine.next()}>
+        ⏭ Next
       </button>
     </div>
   );

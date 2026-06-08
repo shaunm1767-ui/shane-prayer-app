@@ -5,43 +5,37 @@ class PlaylistController {
     this.queue = [];
     this.currentIndex = 0;
 
-    // sync engine → controller
-    audioEngine.onIndexChange = (index) => {
-      this.currentIndex = index;
-      this.saveState();
-    };
+    this.onChange = null;
 
-    // restore saved session safely
-    const savedQueue = localStorage.getItem("playlist");
-    const savedIndex = localStorage.getItem("currentIndex");
-
-    if (savedQueue) {
-      try {
-        this.queue = JSON.parse(savedQueue);
-        this.currentIndex = parseInt(savedIndex || "0", 10);
-
-        audioEngine.setPlaylist(this.queue);
-      } catch (e) {
-        console.log("Failed to restore playlist:", e);
-      }
-    }
-  }
-
-  // =========================
-  // SAVE STATE
-  // =========================
-  saveState() {
+    // restore session safely
     try {
-      localStorage.setItem("playlist", JSON.stringify(this.queue));
-      localStorage.setItem("currentIndex", this.currentIndex.toString());
+      const saved = localStorage.getItem("playlist");
+      const savedIndex = localStorage.getItem("currentIndex");
+
+      if (saved) {
+        this.queue = JSON.parse(saved);
+        this.currentIndex = parseInt(savedIndex || 0);
+      }
     } catch (e) {
-      console.log("Save state error:", e);
+      console.log("restore failed", e);
     }
   }
 
-  // =========================
+  // sync UI state
+  _emit() {
+    if (this.onChange) {
+      this.onChange({
+        queue: this.queue,
+        currentIndex: this.currentIndex,
+        currentTrack: this.queue[this.currentIndex] || null,
+      });
+    }
+
+    localStorage.setItem("playlist", JSON.stringify(this.queue));
+    localStorage.setItem("currentIndex", this.currentIndex);
+  }
+
   // LOAD PLAYLIST
-  // =========================
   load(queue = [], startIndex = 0) {
     this.queue = queue;
     this.currentIndex = startIndex;
@@ -49,56 +43,35 @@ class PlaylistController {
     audioEngine.setPlaylist(queue);
     audioEngine.playIndex(startIndex);
 
-    this.saveState();
+    this._emit();
   }
 
-  // =========================
-  // PLAY SPECIFIC INDEX
-  // =========================
+  // PLAY CURRENT
   play(index = null) {
-    if (!this.queue.length) return;
-
     if (index !== null) {
       this.currentIndex = index;
     }
 
     audioEngine.playIndex(this.currentIndex);
-
-    this.saveState();
+    this._emit();
   }
 
-  // =========================
-  // PAUSE
-  // =========================
   pause() {
     audioEngine.pause();
   }
 
-  // =========================
-  // NEXT TRACK
-  // =========================
   next() {
-    if (this.currentIndex < this.queue.length - 1) {
-      this.currentIndex++;
-      audioEngine.playIndex(this.currentIndex);
-      this.saveState();
-    }
+    this.currentIndex++;
+    audioEngine.playIndex(this.currentIndex);
+    this._emit();
   }
 
-  // =========================
-  // PREVIOUS TRACK
-  // =========================
   previous() {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-      audioEngine.playIndex(this.currentIndex);
-      this.saveState();
-    }
+    this.currentIndex--;
+    audioEngine.playIndex(this.currentIndex);
+    this._emit();
   }
 
-  // =========================
-  // CLEAR SESSION
-  // =========================
   clear() {
     this.queue = [];
     this.currentIndex = 0;
@@ -107,13 +80,7 @@ class PlaylistController {
     localStorage.removeItem("currentIndex");
 
     audioEngine.clear();
-  }
-
-  // =========================
-  // GET CURRENT TRACK
-  // =========================
-  getCurrent() {
-    return this.queue[this.currentIndex] || null;
+    this._emit();
   }
 }
 

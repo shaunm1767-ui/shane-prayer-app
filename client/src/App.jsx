@@ -2,9 +2,9 @@ import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./Login";
-import Home from "./Home";
-import Player from "./screens/Player"; // we create this next
 
+import Player from "./screens/Player";
+import Home from "./screens/HomeScreen";
 import { AuthContext } from "./AuthProvider";
 
 export default function App() {

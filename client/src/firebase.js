@@ -1,8 +1,8 @@
 ﻿import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCofVQ2vhydFPPxVyfkRMqA6_fqqMs9H1s",
   authDomain: "shane-prayer-app-2026-f2a3e.firebaseapp.com",
@@ -12,9 +12,8 @@ const firebaseConfig = {
   appId: "1:142736085758:web:d15c27b44d6972b5de4baf"
 };
 
-// Prevent double init (VERY IMPORTANT in Vite)
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Export services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);

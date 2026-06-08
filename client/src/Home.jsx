@@ -1,10 +1,24 @@
 import React, { useEffect } from "react";
+
 import audioEngine from "./audioEngine";
 import { playlist } from "./playlist";
+import { loadFirebasePlaylist } from "./firebasePlaylistScanner";
 
 export default function Home() {
+
   useEffect(() => {
     audioEngine.setPlaylist(playlist);
+
+    loadFirebasePlaylist()
+      .then((list) => {
+        if (list && list.length > 0) {
+          audioEngine.setPlaylist(list);
+        }
+      })
+      .catch((err) => {
+        console.log("Firebase playlist error:", err);
+      });
+
   }, []);
 
   return (

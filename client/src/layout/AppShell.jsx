@@ -29,14 +29,18 @@ export default function AppShell() {
 
   return (
     <div style={styles.app}>
-      {/* CONTENT AREA */}
-      <div style={styles.content}>{renderScreen()}</div>
+      {/* SCREEN AREA */}
+      <div style={styles.screen}>{renderScreen()}</div>
 
       {/* MINI PLAYER (sticky like Spotify) */}
-      <NowPlayingBar />
+      <div style={styles.player}>
+        <NowPlayingBar />
+      </div>
 
       {/* BOTTOM NAV */}
-      <BottomNav current={tab} setTab={setTab} />
+      <div style={styles.nav}>
+        <BottomNav current={tab} setTab={setTab} />
+      </div>
     </div>
   );
 }
@@ -48,12 +52,26 @@ const styles = {
     flexDirection: "column",
     background: "#0f0f0f",
     color: "#fff",
-    overflow: "hidden",
   },
-  content: {
+  screen: {
     flex: 1,
     overflowY: "auto",
-    padding: 16,
     paddingBottom: 120, // space for player + nav
+  },
+  player: {
+    position: "fixed",
+    bottom: 60,
+    left: 0,
+    right: 0,
+    zIndex: 50,
+  },
+  nav: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 60,
+    background: "#111",
+    borderTop: "1px solid #222",
   },
 };

@@ -1,10 +1,6 @@
 import { useState } from "react";
 import BottomNav from "./BottomNav";
 import HomeScreen from "../screens/HomeScreen";
-import ListenScreen from "../screens/ListenScreen";
-import PrayScreen from "../screens/PrayScreen";
-import SupportScreen from "../screens/SupportScreen";
-import SettingsScreen from "../screens/SettingsScreen";
 import NowPlayingBar from "../components/NowPlayingBar";
 
 export default function AppShell() {
@@ -15,63 +11,51 @@ export default function AppShell() {
       case "home":
         return <HomeScreen />;
       case "listen":
-        return <ListenScreen />;
+        return <div style={styles.screen}>Listen Screen</div>;
       case "pray":
-        return <PrayScreen />;
+        return <div style={styles.screen}>Pray Screen</div>;
       case "support":
-        return <SupportScreen />;
+        return <div style={styles.screen}>Support Screen</div>;
       case "settings":
-        return <SettingsScreen />;
+        return <div style={styles.screen}>Settings Screen</div>;
       default:
         return <HomeScreen />;
     }
   };
 
   return (
-    <div style={styles.app}>
-      {/* SCREEN AREA */}
-      <div style={styles.screen}>{renderScreen()}</div>
-
-      {/* MINI PLAYER (sticky like Spotify) */}
-      <div style={styles.player}>
-        <NowPlayingBar />
+    <div style={styles.shell}>
+      <div style={styles.content}>
+        <div key={tab} style={styles.screen}>
+          {renderScreen()}
+        </div>
       </div>
 
-      {/* BOTTOM NAV */}
-      <div style={styles.nav}>
-        <BottomNav current={tab} setTab={setTab} />
-      </div>
+      <BottomNav current={tab} setTab={setTab} />
+
+      <NowPlayingBar />
     </div>
   );
 }
 
 const styles = {
-  app: {
+  shell: {
     height: "100vh",
     display: "flex",
     flexDirection: "column",
     background: "#0f0f0f",
-    color: "#fff",
   },
-  screen: {
+
+  content: {
     flex: 1,
+    overflow: "hidden",
+    position: "relative",
+  },
+
+  screen: {
+    height: "100%",
     overflowY: "auto",
-    paddingBottom: 120, // space for player + nav
-  },
-  player: {
-    position: "fixed",
-    bottom: 60,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-  },
-  nav: {
-    position: "fixed",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 60,
-    background: "#111",
-    borderTop: "1px solid #222",
+    paddingBottom: 80,
+    animation: "fadeIn 160ms ease-in-out",
   },
 };

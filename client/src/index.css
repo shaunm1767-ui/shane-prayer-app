@@ -1,33 +1,10 @@
-.app-shell {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #0f0f0f;
-  color: white;
-  font-family: system-ui, sans-serif;
-}
-
-/* main scroll area */
-.app-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  padding-bottom: 120px; /* space for player + nav */
-  background: linear-gradient(to bottom, #121212, #0f0f0f);
-}
-
-/* screen sections */
-.screen {
-  padding: 16px 0;
-}
-
-/* headings */
-h1 {
-  font-size: 22px;
-  margin-bottom: 12px;
-}
-
-/* optional mobile feel */
-button {
-  border-radius: 12px;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

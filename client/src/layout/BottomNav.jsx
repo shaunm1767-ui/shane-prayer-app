@@ -8,27 +8,41 @@ export default function BottomNav({ current, setTab }) {
   ];
 
   return (
-    <div style={{
-      display: "flex",
-      justifyContent: "space-around",
-      padding: "10px 0",
-      background: "#181818",
-      borderTop: "1px solid #333"
-    }}>
-      {items.map(item => (
-        <button
+    <div style={styles.nav}>
+      {items.map((item) => (
+        <div
           key={item.id}
-          onClick={() => setTab(item.id)}
+          onClick={() => {
+            navigator.vibrate?.(10);
+            setTab(item.id);
+          }}
           style={{
-            background: "none",
-            border: "none",
-            color: current === item.id ? "#1db954" : "#aaa",
-            fontSize: 12
+            ...styles.item,
+            opacity: current === item.id ? 1 : 0.5,
+            transform: current === item.id ? "scale(1.05)" : "scale(1)",
           }}
         >
           {item.label}
-        </button>
+        </div>
       ))}
     </div>
   );
 }
+
+const styles = {
+  nav: {
+    height: 60,
+    display: "flex",
+    justifyContent: "space-around",
+    alignItems: "center",
+    background: "#111",
+    borderTop: "1px solid #222",
+  },
+
+  item: {
+    fontSize: 12,
+    color: "#fff",
+    cursor: "pointer",
+    transition: "all 120ms ease",
+  },
+};

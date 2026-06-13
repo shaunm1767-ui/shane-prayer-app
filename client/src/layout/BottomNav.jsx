@@ -1,34 +1,34 @@
 export default function BottomNav({ current, setTab }) {
-  const Item = ({ id, label }) => (
-    <button
-      onClick={() => setTab(id)}
-      style={{
-        flex: 1,
-        padding: 14,
-        border: "none",
-        background: "white",
-        fontSize: 13,
-        fontWeight: current === id ? "bold" : "normal",
-        color: current === id ? "#1a7f37" : "#666",
-      }}
-    >
-      {label}
-    </button>
-  );
+  const items = [
+    { id: "home", label: "Home" },
+    { id: "listen", label: "Listen" },
+    { id: "pray", label: "Pray" },
+    { id: "support", label: "Support" },
+    { id: "settings", label: "Settings" },
+  ];
 
   return (
-    <div
-      style={{
-        display: "flex",
-        borderTop: "1px solid #ddd",
-        background: "#fff",
-      }}
-    >
-      <Item id="home" label="Home" />
-      <Item id="listen" label="Listen" />
-      <Item id="pray" label="Pray" />
-      <Item id="support" label="Support" />
-      <Item id="settings" label="Settings" />
+    <div style={{
+      display: "flex",
+      justifyContent: "space-around",
+      padding: "10px 0",
+      background: "#181818",
+      borderTop: "1px solid #333"
+    }}>
+      {items.map(item => (
+        <button
+          key={item.id}
+          onClick={() => setTab(item.id)}
+          style={{
+            background: "none",
+            border: "none",
+            color: current === item.id ? "#1db954" : "#aaa",
+            fontSize: 12
+          }}
+        >
+          {item.label}
+        </button>
+      ))}
     </div>
   );
 }

@@ -1,65 +1,72 @@
-import React, { useEffect, useState } from "react";
-import audioEngine from "../audioEngine.js";
+import { useEffect, useState } from "react";
+import playlistController from "../core/playlistController";
 
 export default function NowPlayingBar() {
-  const [track, setTrack] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [current, setCurrent] = useState(null);
+  const [playing, setPlaying] = useState(false);
 
-  // 🔄 sync with engine every second (simple + stable)
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTrack(audioEngine.getCurrentTrack?.() || audioEngine.currentTrack);
-      setIsPlaying(audioEngine.isPlaying);
-    }, 500);
-
-    return () => clearInterval(interval);
+    playlistController.onIndexChange = () => {
+      const track = playlistController.getCurrent?.();
+      setCurrent(track);
+      setPlaying(true);
+    };
   }, []);
 
-  if (!track) return null;
-
-  const togglePlay = () => {
-    if (audioEngine.isPlaying) {
-      audioEngine.pause();
+  const toggle = () => {
+    if (playing) {
+      playlistController.pause();
+      setPlaying(false);
     } else {
-      audioEngine.play(track);
+      playlistController.play();
+      setPlaying(true);
     }
   };
 
-  const skipNext = () => audioEngine.next();
-  const skipPrev = () => audioEngine.previous();
+  if (!current) return null;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 60,
-        left: 0,
-        right: 0,
-        background: "#111",
-        color: "#fff",
-        padding: "10px 15px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        zIndex: 9999,
-      }}
-    >
-      {/* LEFT: TRACK INFO */}
-      <div style={{ fontSize: 12 }}>
+    <div style={styles.bar}>
+      <div style={styles.info}>
         🎧 Now Playing
-        <div style={{ fontWeight: "bold" }}>
-          {track.split("/").pop()}
+        <div style={styles.title}>
+          {current.split("/").pop()}
         </div>
       </div>
 
-      {/* CENTER: CONTROLS */}
-      <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={skipPrev}>⏮</button>
-        <button onClick={togglePlay}>
-          {isPlaying ? "⏸" : "▶"}
-        </button>
-        <button onClick={skipNext}>⏭</button>
-      </div>
+      <button onClick={toggle} style={styles.btn}>
+        {playing ? "⏸" : "▶"}
+      </button>
     </div>
   );
 }
+
+const styles = {
+  bar: {
+    position: "fixed",
+    bottom: 60,
+    left: 0,
+    right: 0,
+    height: 60,
+    background: "#111",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "0 16px",
+    borderTop: "1px solid #222",
+  },
+  info: {
+    fontSize: 12,
+    opacity: 0.8,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  btn: {
+    fontSize: 18,
+    background: "transparent",
+    color: "#fff",
+    border: "none",
+  },
+};

@@ -1,44 +1,40 @@
-import { useEffect, useState } from "react";
 import playlistController from "../core/playlistController";
 
 export default function ListenScreen() {
-  const [state, setState] = useState({
-    queue: [],
-    currentIndex: 0,
-    currentTrack: null,
-  });
-
-  useEffect(() => {
-    playlistController.onChange = setState;
-  }, []);
-
   const playlist = [
     "/audio/track1.mp3",
     "/audio/track2.mp3",
     "/audio/track3.mp3",
   ];
 
-  const playTrack = (track, index) => {
+  const play = (track, index) => {
     playlistController.load(playlist, index);
+    playlistController.play(index);
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Listen</h1>
+    <div>
+      <h2 style={{ marginBottom: 20 }}>Listen</h2>
 
-      <h3>Playlist</h3>
-
-      {playlist.map((t, i) => (
-        <div key={t} onClick={() => playTrack(t, i)}>
+      {playlist.map((track, i) => (
+        <div
+          key={track}
+          onClick={() => play(track, i)}
+          style={styles.card}
+        >
           🎵 Track {i + 1}
         </div>
       ))}
-
-      <div style={{ marginTop: 20 }}>
-        <button onClick={() => playlistController.pause()}>Pause</button>
-        <button onClick={() => playlistController.next()}>Next</button>
-        <button onClick={() => playlistController.previous()}>Prev</button>
-      </div>
     </div>
   );
 }
+
+const styles = {
+  card: {
+    padding: 14,
+    marginBottom: 10,
+    borderRadius: 12,
+    background: "#1a1a1a",
+    cursor: "pointer",
+  },
+};

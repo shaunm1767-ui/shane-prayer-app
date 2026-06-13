@@ -1,22 +1,22 @@
-import playlistController from "../core/playlistController";
-
-export default function NowPlayingBar() {
-  const current = playlistController.getCurrent?.();
-
-  if (!current) return null;
-
+export default function NowPlayingBar({ track, isPlaying, onPause }) {
   return (
     <div style={styles.bar}>
-      <div>
-        <div style={styles.title}>Now Playing</div>
-        <div style={styles.sub}>
-          {current?.split("/").pop()}
-        </div>
+      <div style={styles.left}>
+        {track ? (
+          <>
+            🎧 {track}
+          </>
+        ) : (
+          "🎧 Nothing playing"
+        )}
       </div>
 
-      <div style={styles.actions}>
-        <button onClick={() => playlistController.pause()}>⏸</button>
-        <button onClick={() => playlistController.next?.()}>⏭</button>
+      <div style={styles.right}>
+        {track && (
+          <button onClick={onPause} style={styles.btn}>
+            {isPlaying ? "⏸" : "▶"}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -24,32 +24,31 @@ export default function NowPlayingBar() {
 
 const styles = {
   bar: {
-    height: 64,
-    margin: "0 10px 10px 10px",
+    height: 60,
+    background: "#1a1a22",
     borderRadius: 14,
-    background: "rgba(24,24,24,0.92)",
-    backdropFilter: "blur(10px)",
-    color: "#fff",
+    border: "1px solid #2a2a35",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     padding: "0 12px",
-    border: "1px solid #2a2a2a",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.4)",
   },
 
-  title: {
-    fontSize: 12,
-    fontWeight: 600,
+  left: {
+    fontSize: 13,
   },
 
-  sub: {
-    fontSize: 10,
-    opacity: 0.6,
-  },
-
-  actions: {
+  right: {
     display: "flex",
-    gap: 8,
+    alignItems: "center",
+  },
+
+  btn: {
+    background: "#1db954",
+    border: "none",
+    borderRadius: 8,
+    padding: "6px 10px",
+    cursor: "pointer",
   },
 };

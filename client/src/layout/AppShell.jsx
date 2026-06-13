@@ -1,6 +1,10 @@
 import { useState } from "react";
 import BottomNav from "./BottomNav";
 import HomeScreen from "../screens/HomeScreen";
+import ListenScreen from "../screens/ListenScreen";
+import PrayScreen from "../screens/PrayScreen";
+import SupportScreen from "../screens/SupportScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 import NowPlayingBar from "../components/NowPlayingBar";
 
 export default function AppShell() {
@@ -11,13 +15,13 @@ export default function AppShell() {
       case "home":
         return <HomeScreen />;
       case "listen":
-        return <div style={styles.screen}>Listen Screen</div>;
+        return <ListenScreen />;
       case "pray":
-        return <div style={styles.screen}>Pray Screen</div>;
+        return <PrayScreen />;
       case "support":
-        return <div style={styles.screen}>Support Screen</div>;
+        return <SupportScreen />;
       case "settings":
-        return <div style={styles.screen}>Settings Screen</div>;
+        return <SettingsScreen />;
       default:
         return <HomeScreen />;
     }
@@ -26,9 +30,7 @@ export default function AppShell() {
   return (
     <div style={styles.shell}>
       <div style={styles.content}>
-        <div key={tab} style={styles.screen}>
-          {renderScreen()}
-        </div>
+        {renderScreen()}
       </div>
 
       <BottomNav current={tab} setTab={setTab} />
@@ -44,18 +46,11 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     background: "#0f0f0f",
+    color: "white",
   },
 
   content: {
     flex: 1,
-    overflow: "hidden",
-    position: "relative",
-  },
-
-  screen: {
-    height: "100%",
     overflowY: "auto",
-    paddingBottom: 80,
-    animation: "fadeIn 160ms ease-in-out",
   },
 };

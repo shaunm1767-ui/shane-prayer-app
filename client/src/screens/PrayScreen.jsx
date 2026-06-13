@@ -1,28 +1,19 @@
+import Card from "../components/Card";
+
 export default function PrayScreen() {
   return (
-    <div style={styles.container}>
-      <h2>Pray</h2>
+    <div style={{ padding: 20 }}>
+      <h1>🙏 Pray</h1>
 
-      <div style={styles.card}>
-        <p>Daily Prayer Feed</p>
-      </div>
+      <Card>
+        <h3>Prayer Requests</h3>
+        <p>Submit a prayer request.</p>
+      </Card>
 
-      <div style={styles.card}>
-        <p>Guided Sessions</p>
-      </div>
+      <Card>
+        <h3>Prayer Journal</h3>
+        <p>Record your reflections.</p>
+      </Card>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: 16,
-    color: "#fff",
-  },
-  card: {
-    padding: 12,
-    marginTop: 10,
-    background: "#1a1a1a",
-    borderRadius: 10,
-  },
-};

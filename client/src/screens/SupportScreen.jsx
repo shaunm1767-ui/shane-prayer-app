@@ -1,28 +1,19 @@
+import Card from "../components/Card";
+
 export default function SupportScreen() {
   return (
-    <div style={styles.container}>
-      <h2>Support</h2>
+    <div style={{ padding: 20 }}>
+      <h1>❤️ Support</h1>
 
-      <div style={styles.card}>
-        <p>Help Center</p>
-      </div>
+      <Card>
+        <h3>Donate</h3>
+        <p>Help keep this ministry growing.</p>
+      </Card>
 
-      <div style={styles.card}>
-        <p>Contact Us</p>
-      </div>
+      <Card>
+        <h3>Contact Us</h3>
+        <p>Reach out for support.</p>
+      </Card>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: 16,
-    color: "#fff",
-  },
-  card: {
-    padding: 12,
-    marginTop: 10,
-    background: "#1a1a1a",
-    borderRadius: 10,
-  },
-};

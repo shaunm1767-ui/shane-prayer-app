@@ -1,30 +1,38 @@
 export default function BottomNav({ current, setTab }) {
-  const items = [
-    { id: "home", label: "Home" },
-    { id: "listen", label: "Listen" },
-    { id: "pray", label: "Pray" },
-    { id: "support", label: "Support" },
-    { id: "settings", label: "Settings" },
+  const tabs = [
+    { id: "home", label: "Home", icon: "🏠" },
+    { id: "listen", label: "Listen", icon: "🎧" },
+    { id: "pray", label: "Pray", icon: "🙏" },
+    { id: "support", label: "Support", icon: "🤝" },
+    { id: "settings", label: "Settings", icon: "⚙️" },
   ];
 
   return (
-    <div style={styles.nav}>
-      {items.map((item) => {
-        const active = current === item.id;
+    <div style={styles.container}>
+      {tabs.map((tab) => {
+        const active = current === tab.id;
 
         return (
-          <div
-            key={item.id}
-            onClick={() => setTab(item.id)}
+          <button
+            key={tab.id}
+            onClick={() => setTab(tab.id)}
             style={{
-              ...styles.item,
-              color: active ? "#1db954" : "#aaa",
-              transform: active ? "scale(1.08)" : "scale(1)",
+              ...styles.button,
+              ...(active ? styles.activeButton : {}),
             }}
           >
-            <div style={styles.dot(active)} />
-            {item.label}
-          </div>
+            <div style={styles.icon}>{tab.icon}</div>
+
+            <div
+              style={{
+                ...styles.label,
+                color: active ? "#1DB954" : "#B3B3B3",
+                fontWeight: active ? 600 : 400,
+              }}
+            >
+              {tab.label}
+            </div>
+          </button>
         );
       })}
     </div>
@@ -32,27 +40,56 @@ export default function BottomNav({ current, setTab }) {
 }
 
 const styles = {
-  nav: {
-    height: "70px",
+  container: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    right: 0,
+
+    height: 68,
+
     display: "flex",
     justifyContent: "space-around",
     alignItems: "center",
-    background: "#121218",
-    borderTop: "1px solid #222",
+
+    background: "#181818",
+
+    borderTop: "1px solid #282828",
+
+    zIndex: 999,
   },
 
-  item: {
-    fontSize: "12px",
-    textAlign: "center",
+  button: {
+    flex: 1,
+
+    height: "100%",
+
+    border: "none",
+
+    background: "transparent",
+
+    color: "#B3B3B3",
+
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+
     cursor: "pointer",
+
     transition: "all 0.2s ease",
   },
 
-  dot: (active) => ({
-    width: 6,
-    height: 6,
-    borderRadius: "50%",
-    margin: "0 auto 4px",
-    background: active ? "#1db954" : "transparent",
-  }),
+  activeButton: {
+    transform: "translateY(-2px)",
+  },
+
+  icon: {
+    fontSize: 20,
+    marginBottom: 4,
+  },
+
+  label: {
+    fontSize: 11,
+  },
 };

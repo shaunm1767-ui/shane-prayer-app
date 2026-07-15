@@ -1,33 +1,64 @@
-import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import playlistController from "../core/playlistController";
+import { loadFirebasePlaylist } from "../firebasePlaylistScanner";
 
 export default function HomeScreen() {
+  const [playlist, setPlaylist] = useState([]);
   const [currentTrack, setCurrentTrack] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
-  const playlist = [
-    "/audio/track1.mp3",
-    "/audio/track2.mp3",
-    "/audio/track3.mp3",
-  ];
+  useEffect(() => {
+    let active = true;
+
+    async function loadTracks() {
+      setLoading(true);
+      setLoadError("");
+
+      const tracks = await loadFirebasePlaylist("aarti");
+
+      if (!active) return;
+
+      setPlaylist(tracks);
+      setLoading(false);
+
+      if (!tracks.length) {
+        setLoadError("No devotional tracks were found.");
+      }
+    }
+
+    loadTracks();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const playTrack = (track, index) => {
+    console.log("[HOME] Playing track:", track);
+
     playlistController.load(playlist, index);
-    playlistController.play(index);
     setCurrentTrack(track);
   };
 
-  const pause = () => {
+  const playFeatured = () => {
+    if (!playlist.length) return;
+    playTrack(playlist[0], 0);
+  };
+
+  const pause = (event) => {
+    event.stopPropagation();
     playlistController.pause();
   };
 
-  const clear = () => {
+  const clear = (event) => {
+    event.stopPropagation();
     playlistController.clear();
     setCurrentTrack(null);
   };
 
   return (
     <div style={styles.container}>
-      {/* GREETING */}
       <div style={styles.hero}>
         <h2 style={styles.title}>Good Evening</h2>
         <p style={styles.subtitle}>
@@ -35,25 +66,32 @@ export default function HomeScreen() {
         </p>
       </div>
 
-      {/* FEATURED CARD */}
       <div style={styles.featured}>
         <h3>Featured Prayer</h3>
         <p>Start your day with calm reflection and grounding.</p>
-        <button style={styles.primaryBtn}>
-          ▶ Play Featured
+
+        <button
+          style={styles.primaryBtn}
+          onClick={playFeatured}
+          disabled={loading || !playlist.length}
+        >
+          {loading ? "Loading prayers..." : "▶ Play Featured"}
         </button>
       </div>
 
-      {/* PLAYLIST */}
       <div style={styles.section}>
         <h3 style={styles.sectionTitle}>Your Playlist</h3>
 
+        {loadError && (
+          <p style={styles.error}>{loadError}</p>
+        )}
+
         {playlist.map((track, index) => {
-          const active = currentTrack === track;
+          const active = currentTrack?.id === track.id;
 
           return (
             <div
-              key={track}
+              key={track.id}
               onClick={() => playTrack(track, index)}
               style={{
                 ...styles.trackCard,
@@ -62,7 +100,7 @@ export default function HomeScreen() {
               }}
             >
               <div>
-                🎵 Track {index + 1}
+                🎵 {track.title}
               </div>
 
               <div style={styles.trackActions}>
@@ -132,16 +170,19 @@ const styles = {
     marginBottom: 10,
   },
 
+  error: {
+    color: "#ff8a8a",
+    fontSize: 13,
+  },
+
   trackCard: {
     padding: 12,
     borderRadius: 10,
     border: "1px solid #2f2f2f",
     marginBottom: 10,
-
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-
     cursor: "pointer",
   },
 

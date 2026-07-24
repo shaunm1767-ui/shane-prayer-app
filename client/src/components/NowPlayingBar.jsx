@@ -25,6 +25,11 @@ export default function NowPlayingBar() {
     playlistController.toggle();
   };
 
+  const stopPlayback = () => {
+    if (!playerState.currentTrack) return;
+    playlistController.stop();
+  };
+
   const trackTitle =
     playerState.currentTrack?.title ||
     playerState.currentTrack?.name ||
@@ -49,6 +54,13 @@ export default function NowPlayingBar() {
       </div>
 
       <div style={styles.controls}>
+<button
+    style={styles.stopButton}
+    onClick={stopPlayback}
+    disabled={!playerState.currentTrack}
+>
+    ■
+</button>
         <button
           style={{
             ...styles.button,
@@ -122,10 +134,20 @@ const styles = {
     textOverflow: "ellipsis",
   },
 
-  controls: {
+ controls: {
     flexShrink: 0,
-  },
-
+    display: "flex",
+    gap: 8,
+},
+stopButton: {
+    width: 36,
+    height: 36,
+    border: "none",
+    borderRadius: "50%",
+    background: "#444",
+    color: "#fff",
+    cursor: "pointer",
+},
   button: {
     width: 40,
     height: 40,
@@ -138,3 +160,4 @@ const styles = {
     fontSize: 16,
   },
 };
+

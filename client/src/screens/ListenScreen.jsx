@@ -1,55 +1,79 @@
+﻿import { useState } from "react";
 import playlistController from "../core/playlistController";
+import { loadFirebasePlaylist } from "../firebasePlaylistScanner";
 
 export default function ListenScreen() {
+  const [loadingFolder, setLoadingFolder] = useState("");
+  const [message, setMessage] = useState("");
+
   const playlists = [
     {
       title: "Morning Prayers",
       subtitle: "Start your day grounded",
-      tracks: ["/audio/track1.mp3", "/audio/track2.mp3"],
+      folder: "aarti",
     },
     {
       title: "Meditation",
-      subtitle: "Calm & reflection",
-      tracks: ["/audio/track2.mp3", "/audio/track3.mp3"],
+      subtitle: "Calm and reflection",
+      folder: "meditation",
     },
     {
       title: "Bhajans",
       subtitle: "Devotional music collection",
-      tracks: ["/audio/track1.mp3"],
+      folder: "bhajan",
     },
   ];
 
-  const playPlaylist = (tracks) => {
+  const playPlaylist = async (folder) => {
+    if (loadingFolder) return;
+
+    setLoadingFolder(folder);
+    setMessage("");
+
+    const tracks = await loadFirebasePlaylist(folder);
+
+    if (!tracks.length) {
+      setMessage(`No playable tracks found in ${folder}.`);
+      setLoadingFolder("");
+      return;
+    }
+
     playlistController.load(tracks, 0);
-    playlistController.play(0);
+    setLoadingFolder("");
   };
 
   return (
     <div style={styles.container}>
-      {/* HEADER */}
       <h2 style={styles.header}>🎧 Listen</h2>
 
       <p style={styles.subtext}>
         Choose a devotional collection to begin
       </p>
 
-      {/* CATEGORY LIST */}
+      {message && <p style={styles.message}>{message}</p>}
+
       <div style={styles.grid}>
-        {playlists.map((list, index) => (
-          <div
-            key={index}
-            onClick={() => playPlaylist(list.tracks)}
-            style={styles.card}
-          >
-            <h3 style={styles.title}>{list.title}</h3>
+        {playlists.map((list) => {
+          const isLoading = loadingFolder === list.folder;
 
-            <p style={styles.subtitle}>{list.subtitle}</p>
+          return (
+            <button
+              type="button"
+              key={list.folder}
+              onClick={() => playPlaylist(list.folder)}
+              style={styles.card}
+              disabled={Boolean(loadingFolder)}
+            >
+              <h3 style={styles.title}>{list.title}</h3>
 
-            <div style={styles.playBtn}>
-              ▶ Play
-            </div>
-          </div>
-        ))}
+              <p style={styles.subtitle}>{list.subtitle}</p>
+
+              <div style={styles.playBtn}>
+                {isLoading ? "Loading..." : "▶ Play"}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -72,6 +96,12 @@ const styles = {
     marginBottom: 16,
   },
 
+  message: {
+    color: "#ffb4a9",
+    fontSize: 13,
+    marginBottom: 14,
+  },
+
   grid: {
     display: "flex",
     flexDirection: "column",
@@ -79,7 +109,10 @@ const styles = {
   },
 
   card: {
+    width: "100%",
+    textAlign: "left",
     background: "#1a1a1a",
+    color: "#fff",
     border: "1px solid #2a2a2a",
     borderRadius: 12,
     padding: 14,

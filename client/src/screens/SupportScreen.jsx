@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 
 export default function SupportScreen() {
   const [openFAQ, setOpenFAQ] = useState(null);
@@ -16,12 +16,23 @@ export default function SupportScreen() {
     );
     window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
   };
-
   const openEmail = () => {
-    window.location.href =
-      "mailto:support@shaneprayerapp.com?subject=App Support Request";
-  };
+    const to = "punditshanesatsang@gmail.com";
+    const subject = encodeURIComponent("Shane Prayer App Support Request");
+    const body = encodeURIComponent(
+      "Hi,\n\n" +
+      "I need assistance with the Shane Prayer App.\n\n" +
+      "Please describe your issue below:\n\n" +
+      "---------------------------------\n\n" +
+      "Device:\n" +
+      "App Version:\n"
+    );
 
+    const gmailUrl =
+      `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
+
+    window.open(gmailUrl, "_blank", "noopener,noreferrer");
+  };
   const faq = [
     {
       q: "App is not playing audio?",
@@ -50,11 +61,11 @@ export default function SupportScreen() {
         <h3>Need Help Fast?</h3>
 
         <button onClick={openWhatsApp} style={styles.primaryBtn}>
-          💬 WhatsApp Support
+          ðŸ’¬ WhatsApp Support
         </button>
 
         <button onClick={openEmail} style={styles.secondaryBtn}>
-          ✉️ Email Support
+          âœ‰ï¸ Email Support
         </button>
       </div>
 
@@ -149,3 +160,4 @@ const styles = {
     color: "#bdbdbd",
   },
 };
+

@@ -130,7 +130,12 @@
   pause() {
     this.audio.pause();
   }
-
+stop() {
+    this.audio.pause();
+    this.audio.currentTime = 0;
+    this.isPlaying = false;
+    this.emit();
+}
   toggle() {
     if (this.isPlaying) {
       this.pause();

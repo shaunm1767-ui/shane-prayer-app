@@ -61,7 +61,9 @@ class PlaylistController {
   pause() {
     audioEngine.pause();
   }
-
+stop() {
+    audioEngine.stop();
+}
   toggle() {
     audioEngine.toggle();
   }

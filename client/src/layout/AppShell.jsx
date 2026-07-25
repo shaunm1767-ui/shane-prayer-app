@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 
 import BottomNav from "./BottomNav";
 import NowPlayingBar from "../components/NowPlayingBar";
@@ -10,7 +10,7 @@ import SupportScreen from "../screens/SupportScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 
 export default function AppShell() {
-  const [tab, setTab] = useState("home");
+  const [tab, setTab] = useState("pray");
 
   const renderScreen = () => {
     switch (tab) {

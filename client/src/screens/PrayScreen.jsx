@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useState } from "react";
+import playlistController from "../core/playlistController";
+import { loadFirebasePlaylist } from "../firebasePlaylistScanner";
 
 export default function PrayScreen() {
-  const audioRef = useRef(null);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const day = new Date().getDay();
 
@@ -15,7 +15,8 @@ export default function PrayScreen() {
       mantra: "Om Suryaya Namaha",
       message: "Reset your energy and focus on clarity.",
       reflection: "What do I need clarity on this week?",
-      audio: "/audio/surya.mp3",
+      folder: "aarti",
+      match: "uniserval",
       theme: "linear-gradient(135deg, #ffb347, #ffcc33)",
     },
     1: {
@@ -24,7 +25,8 @@ export default function PrayScreen() {
       mantra: "Om Namah Shivaya",
       message: "Let go of stress and return to peace.",
       reflection: "What am I holding onto unnecessarily?",
-      audio: "/audio/shiva.mp3",
+      folder: "aarti",
+      match: "shiv",
       theme: "linear-gradient(135deg, #1c1c1c, #434343)",
     },
     2: {
@@ -33,7 +35,8 @@ export default function PrayScreen() {
       mantra: "Om Hanumate Namaha",
       message: "Face challenges with courage and discipline.",
       reflection: "Where do I need strength today?",
-      audio: "/audio/hanuman.mp3",
+      folder: "aarti",
+      match: "hanuman",
       theme: "linear-gradient(135deg, #ff4e50, #f9d423)",
     },
     3: {
@@ -42,7 +45,8 @@ export default function PrayScreen() {
       mantra: "Om Gan Ganapataye Namaha",
       message: "Remove obstacles and gain clarity.",
       reflection: "What is blocking my progress?",
-      audio: "/audio/ganesha.mp3",
+      folder: "aarti",
+      match: "ganesh",
       theme: "linear-gradient(135deg, #43cea2, #185a9d)",
     },
     4: {
@@ -51,7 +55,8 @@ export default function PrayScreen() {
       mantra: "Om Namo Bhagavate Vasudevaya",
       message: "Stay open to wisdom and guidance.",
       reflection: "Who is guiding me right now?",
-      audio: "/audio/guru.mp3",
+      folder: "bhajan",
+      match: "gurucharanan",
       theme: "linear-gradient(135deg, #2193b0, #6dd5ed)",
     },
     5: {
@@ -60,7 +65,8 @@ export default function PrayScreen() {
       mantra: "Om Shreem Mahalakshmiyei Namaha",
       message: "Focus on gratitude and abundance.",
       reflection: "What am I grateful for today?",
-      audio: "/audio/lakshmi.mp3",
+      folder: "aarti",
+      match: "luxmi",
       theme: "linear-gradient(135deg, #f7971e, #ffd200)",
     },
     6: {
@@ -69,116 +75,85 @@ export default function PrayScreen() {
       mantra: "Om Sham Shanicharaya Namaha",
       message: "Stay grounded and disciplined.",
       reflection: "Where do I need structure?",
-      audio: "/audio/shani.mp3",
+      folder: "aarti",
+      match: "uniserval",
       theme: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
     },
   };
 
   const today = guidance[day] || guidance[1];
 
-  // RESET STATE ON DAY CHANGE
-  useEffect(() => {
-    setIsPlaying(false);
-    setProgress(0);
+  const playTodayPrayer = async () => {
+    if (loading) return;
 
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  }, [day]);
+    setLoading(true);
+    setMessage("");
 
-  // PROGRESS SIMULATION
-  useEffect(() => {
-    let interval;
+    const tracks = await loadFirebasePlaylist(today.folder);
 
-    if (isPlaying) {
-      interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) return 100;
-          return prev + 1;
-        });
-      }, 1000);
+    if (!tracks.length) {
+      setMessage("Today's prayer audio could not be loaded.");
+      setLoading(false);
+      return;
     }
 
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+    const matchedTrack =
+      tracks.find((track) =>
+        track.title.toLowerCase().includes(today.match.toLowerCase())
+      ) || tracks[0];
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
+    playlistController.load([matchedTrack], 0);
 
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play();
-      setIsPlaying(true);
-    }
+    setMessage(`Now playing: ${matchedTrack.title}`);
+    setLoading(false);
   };
 
-  const reset = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    setIsPlaying(false);
-    setProgress(0);
+  const stopPrayer = () => {
+    playlistController.stop();
+    setMessage("Prayer stopped.");
   };
 
   return (
     <div style={{ ...styles.container, background: today.theme }}>
-      {/* AUDIO */}
-      <audio
-        ref={audioRef}
-        src={today.audio}
-        onEnded={() => {
-          setIsPlaying(false);
-          setProgress(100);
-        }}
-      />
-
-      {/* HEADER */}
       <div style={styles.header}>
         <h2 style={styles.day}>🕉️ {today.day}</h2>
         <p style={styles.focus}>{today.focus}</p>
       </div>
 
-      {/* PLAYER CARD */}
-      <div
-        style={{
-          ...styles.player,
-          transform: isPlaying ? "scale(1.02)" : "scale(1)",
-          boxShadow: isPlaying
-            ? "0 0 25px rgba(29,185,84,0.3)"
-            : "none",
-        }}
-      >
+      <div style={styles.player}>
         <p style={styles.mantra}>{today.mantra}</p>
 
-        {/* PROGRESS BAR */}
-        <div style={styles.progressWrap}>
-          <div style={{ ...styles.progressBar, width: `${progress}%` }} />
-        </div>
-
-        <p style={styles.percent}>{progress}%</p>
+        <p style={styles.playerHint}>
+          Today's prayer plays through the shared devotional player.
+        </p>
 
         <div style={styles.controls}>
-          <button onClick={togglePlay} style={styles.playBtn}>
-            {isPlaying ? "⏸ Pause" : "▶ Play"}
+          <button
+            type="button"
+            onClick={playTodayPrayer}
+            style={styles.playBtn}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "▶ Play Today's Prayer"}
           </button>
 
-          <button onClick={reset} style={styles.resetBtn}>
-            ↺ Reset
+          <button
+            type="button"
+            onClick={stopPrayer}
+            style={styles.resetBtn}
+          >
+            ■ Stop
           </button>
         </div>
+
+        {message && <p style={styles.status}>{message}</p>}
       </div>
 
-      {/* GUIDANCE */}
       <div style={styles.card}>
         <h3>Daily Guidance</h3>
         <p>{today.message}</p>
       </div>
 
-      {/* REFLECTION */}
       <div style={styles.card}>
         <h3>My Conversations with GOD</h3>
         <p>{today.reflection}</p>
@@ -218,7 +193,6 @@ const styles = {
     padding: 18,
     textAlign: "center",
     backdropFilter: "blur(12px)",
-    transition: "all 0.3s ease",
   },
 
   mantra: {
@@ -227,29 +201,15 @@ const styles = {
     marginBottom: 10,
   },
 
-  progressWrap: {
-    height: 6,
-    background: "rgba(255,255,255,0.2)",
-    borderRadius: 999,
-    overflow: "hidden",
-    marginTop: 10,
-  },
-
-  progressBar: {
-    height: "100%",
-    background: "#1DB954",
-    transition: "width 1s linear",
-  },
-
-  percent: {
-    fontSize: 12,
-    marginTop: 6,
+  playerHint: {
+    fontSize: 13,
     opacity: 0.8,
   },
 
   controls: {
     display: "flex",
     justifyContent: "center",
+    flexWrap: "wrap",
     gap: 10,
     marginTop: 12,
   },
@@ -271,6 +231,11 @@ const styles = {
     borderRadius: 999,
     color: "#fff",
     cursor: "pointer",
+  },
+
+  status: {
+    marginTop: 12,
+    fontSize: 13,
   },
 
   card: {

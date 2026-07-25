@@ -11,6 +11,7 @@ export default function PrayScreen() {
   const guidance = {
     0: {
       day: "Sunday",
+      image: "/images/deities/sunday-surya.png",
       focus: "Surya – Energy & Clarity",
       mantra: "Om Suryaya Namaha",
       message: "Reset your energy and focus on clarity.",
@@ -21,6 +22,7 @@ export default function PrayScreen() {
     },
     1: {
       day: "Monday",
+      image: "/images/deities/monday-shiva.png",
       focus: "Shiva – Calm & Stillness",
       mantra: "Om Namah Shivaya",
       message: "Let go of stress and return to peace.",
@@ -31,6 +33,7 @@ export default function PrayScreen() {
     },
     2: {
       day: "Tuesday",
+      image: "/images/deities/tuesday-hanuman.png",
       focus: "Hanuman – Strength & Courage",
       mantra: "Om Hanumate Namaha",
       message: "Face challenges with courage and discipline.",
@@ -41,6 +44,7 @@ export default function PrayScreen() {
     },
     3: {
       day: "Wednesday",
+      image: "/images/deities/wednesday-ganesha.png",
       focus: "Ganesha – Wisdom & Flow",
       mantra: "Om Gan Ganapataye Namaha",
       message: "Remove obstacles and gain clarity.",
@@ -51,6 +55,7 @@ export default function PrayScreen() {
     },
     4: {
       day: "Thursday",
+      image: "/images/deities/thursday-vishnu.png",
       focus: "Guru – Guidance & Learning",
       mantra: "Om Namo Bhagavate Vasudevaya",
       message: "Stay open to wisdom and guidance.",
@@ -61,6 +66,7 @@ export default function PrayScreen() {
     },
     5: {
       day: "Friday",
+      image: "/images/deities/friday-lakshmi.png",
       focus: "Lakshmi – Abundance & Gratitude",
       mantra: "Om Shreem Mahalakshmiyei Namaha",
       message: "Focus on gratitude and abundance.",
@@ -71,6 +77,7 @@ export default function PrayScreen() {
     },
     6: {
       day: "Saturday",
+      image: "/images/deities/saturday-shani-horizontal.png",
       focus: "Shani – Discipline & Karma",
       mantra: "Om Sham Shanicharaya Namaha",
       message: "Stay grounded and disciplined.",
@@ -120,12 +127,15 @@ export default function PrayScreen() {
         <p style={styles.focus}>{today.focus}</p>
       </div>
 
+      <img
+        src={today.image}
+        alt={`${today.day} devotional deity`}
+        style={styles.deityImage}
+      />
+
       <div style={styles.player}>
         <p style={styles.mantra}>{today.mantra}</p>
 
-        <p style={styles.playerHint}>
-          Today's prayer plays through the shared devotional player.
-        </p>
 
         <div style={styles.controls}>
           <button
@@ -177,6 +187,17 @@ const styles = {
     textAlign: "center",
   },
 
+  deityImage: {
+    width: "76%",
+    height: 220,
+    objectFit: "cover",
+    objectPosition: "center 34%",
+    alignSelf: "center",
+    borderRadius: 18,
+    border: "1px solid rgba(255,215,128,0.45)",
+    boxShadow: "0 8px 22px rgba(0,0,0,0.38)",
+  },
+
   day: {
     fontSize: 26,
     fontWeight: "bold",
@@ -188,17 +209,18 @@ const styles = {
   },
 
   player: {
-    background: "rgba(0,0,0,0.35)",
-    borderRadius: 18,
-    padding: 18,
+    background: "rgba(0,0,0,0.20)",
+    borderRadius: 14,
+    padding: 12,
     textAlign: "center",
-    backdropFilter: "blur(12px)",
+    backdropFilter: "blur(8px)",
+    border: "1px solid rgba(255,255,255,0.12)",
   },
 
   mantra: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "bold",
-    marginBottom: 10,
+    margin: "0 0 8px",
   },
 
   playerHint: {
@@ -244,3 +266,11 @@ const styles = {
     borderRadius: 14,
   },
 };
+
+
+
+
+
+
+
+

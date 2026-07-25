@@ -115,10 +115,6 @@ export default function PrayScreen() {
     setLoading(false);
   };
 
-  const stopPrayer = () => {
-    playlistController.stop();
-    setMessage("Prayer stopped.");
-  };
 
   return (
     <div style={{ ...styles.container, background: today.theme }}>
@@ -145,14 +141,6 @@ export default function PrayScreen() {
             disabled={loading}
           >
             {loading ? "Loading..." : "▶ Play Today's Prayer"}
-          </button>
-
-          <button
-            type="button"
-            onClick={stopPrayer}
-            style={styles.resetBtn}
-          >
-            ■ Stop
           </button>
         </div>
 
@@ -266,6 +254,8 @@ const styles = {
     borderRadius: 14,
   },
 };
+
+
 
 
 

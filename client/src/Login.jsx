@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
 
@@ -49,6 +49,12 @@ export default function Login() {
           style={styles.heroImage}
         />
 
+        <div style={styles.loginQuote}>
+          LIVE TO PRAY
+          <br />
+          PRAY TO LIVE
+        </div>
+
         <form onSubmit={handleLogin} style={styles.card}>
 
           <label style={styles.label} htmlFor="login-email">
@@ -90,7 +96,7 @@ export default function Login() {
               cursor: loading ? "wait" : "pointer",
             }}
           >
-            {loading ? "Entering..." : "🙏 Enter Prayer Space"}
+            {loading ? "Entering..." : "🙏 NAMASTE"}
           </button>
 
           {error && (
@@ -135,17 +141,30 @@ const styles = {
     boxShadow: "0 18px 40px rgba(0,0,0,0.45)",
   },
 
+  loginQuote: {
+    marginTop: 16,
+    marginBottom: 2,
+    textAlign: "center",
+    color: "#F1CD69",
+    fontFamily: "Georgia, 'Times New Roman', serif",
+    fontSize: 22,
+    fontWeight: 700,
+    lineHeight: 1.15,
+    letterSpacing: 1,
+  },
+
   card: {
     width: "100%",
-    maxWidth: 430,
+    maxWidth: 350,
     boxSizing: "border-box",
-    padding: "22px 20px",
-    borderRadius: 24,
-    background:
-      "linear-gradient(180deg, rgba(49,16,68,0.94), rgba(23,8,33,0.97))",
-    border: "1px solid rgba(241,205,105,0.75)",
-    boxShadow: "0 18px 50px rgba(0,0,0,0.55)",
-    backdropFilter: "blur(12px)",
+    marginTop: 12,
+    padding: "14px 16px 18px",
+    borderRadius: 18,
+    background: "rgba(37, 12, 53, 0.42)",
+    border: "1px solid rgba(241, 205, 105, 0.28)",
+    boxShadow: "0 12px 34px rgba(0, 0, 0, 0.24)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
   },
 
   lotus: {
@@ -184,10 +203,11 @@ const styles = {
   input: {
     width: "100%",
     boxSizing: "border-box",
-    padding: "14px 15px",
-    borderRadius: 12,
-    border: "1px solid rgba(241,205,105,0.35)",
-    background: "rgba(12,5,18,0.72)",
+    padding: "10px 2px 9px",
+    borderRadius: 0,
+    border: "none",
+    borderBottom: "1px solid rgba(241,205,105,0.9)",
+    background: "transparent",
     color: "#ffffff",
     fontSize: 16,
     outline: "none",

@@ -11,6 +11,7 @@ export default function PrayScreen() {
   const guidance = {
     0: {
       day: "Sunday",
+hindiDay: "रविवार",
       image: "/images/deities/sunday-surya.png",
       focus: "Surya – Energy & Clarity",
       mantra: "Om Suryaya Namaha",
@@ -21,7 +22,8 @@ export default function PrayScreen() {
       theme: "linear-gradient(135deg, #ffb347, #ffcc33)",
     },
     1: {
-      day: "Monday",
+     day: "Monday",
+hindiDay: "सोमवार",
       image: "/images/deities/monday-shiva.png",
       focus: "Shiva – Calm & Stillness",
       mantra: "Om Namah Shivaya",
@@ -32,7 +34,8 @@ export default function PrayScreen() {
       theme: "linear-gradient(135deg, #1c1c1c, #434343)",
     },
     2: {
-      day: "Tuesday",
+     day: "Tuesday",
+hindiDay: "मंगलवार",
       image: "/images/deities/tuesday-hanuman.png",
       focus: "Hanuman – Strength & Courage",
       mantra: "Om Hanumate Namaha",
@@ -44,6 +47,7 @@ export default function PrayScreen() {
     },
     3: {
       day: "Wednesday",
+hindiDay: "बुधवार",
       image: "/images/deities/wednesday-ganesha.png",
       focus: "Ganesha – Wisdom & Flow",
       mantra: "Om Gan Ganapataye Namaha",
@@ -55,6 +59,7 @@ export default function PrayScreen() {
     },
     4: {
       day: "Thursday",
+hindiDay: "गुरुवार",
       image: "/images/deities/thursday-vishnu.png",
       focus: "Guru – Guidance & Learning",
       mantra: "Om Namo Bhagavate Vasudevaya",
@@ -66,6 +71,7 @@ export default function PrayScreen() {
     },
     5: {
       day: "Friday",
+hindiDay: "शुक्रवार",
       image: "/images/deities/friday-lakshmi.png",
       focus: "Lakshmi – Abundance & Gratitude",
       mantra: "Om Shreem Mahalakshmiyei Namaha",
@@ -76,7 +82,8 @@ export default function PrayScreen() {
       theme: "linear-gradient(135deg, #f7971e, #ffd200)",
     },
     6: {
-      day: "Saturday",
+     day: "Saturday",
+hindiDay: "शनिवार",
       image: "/images/deities/saturday-shani-horizontal.png",
       focus: "Shani – Discipline & Karma",
       mantra: "Om Sham Shanicharaya Namaha",
@@ -119,9 +126,10 @@ export default function PrayScreen() {
   return (
     <div style={{ ...styles.container, background: today.theme }}>
       <div style={styles.header}>
-        <h2 style={styles.day}>🕉️ {today.day}</h2>
-        <p style={styles.focus}>{today.focus}</p>
-      </div>
+  <div style={styles.hindiDay}>{today.hindiDay}</div>
+  <h2 style={styles.day}>🕉️ {today.day}</h2>
+  <p style={styles.focus}>{today.focus}</p>
+</div>
 
       <img
         src={today.image}
@@ -147,10 +155,7 @@ export default function PrayScreen() {
         {message && <p style={styles.status}>{message}</p>}
       </div>
 
-      <div style={styles.card}>
-        <h3>Daily Guidance</h3>
-        <p>{today.message}</p>
-      </div>
+    
 
       <div style={styles.card}>
         <h3>My Conversations with GOD</h3>
@@ -174,7 +179,13 @@ const styles = {
   header: {
     textAlign: "center",
   },
-
+hindiDay: {
+  marginBottom: 2,
+  color: "#FFE39A",
+  fontSize: 24,
+  fontWeight: 700,
+  lineHeight: 1.1,
+},
   deityImage: {
     width: "76%",
     height: 220,

@@ -44,7 +44,7 @@ export default function Login() {
     <main style={styles.page}>
       <section style={styles.content}>
         <img
-          src="/images/login/shane-login-hero.png"
+          src="/images/login/shane-login-header.png"
           alt="Pundit Shane Maharaj"
           style={styles.heroImage}
         />
@@ -157,7 +157,7 @@ const styles = {
     width: "100%",
     maxWidth: 350,
     boxSizing: "border-box",
-    marginTop: 12,
+    marginTop: 28,
     padding: "14px 16px 18px",
     borderRadius: 18,
     background: "rgba(37, 12, 53, 0.42)",

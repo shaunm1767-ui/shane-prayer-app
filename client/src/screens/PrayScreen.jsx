@@ -137,23 +137,18 @@ hindiDay: "शनिवार",
         style={styles.deityImage}
       />
 
-      <div style={styles.player}>
-        <p style={styles.mantra}>{today.mantra}</p>
+     <div style={styles.controls}>
+  <button
+    type="button"
+    onClick={playTodayPrayer}
+    style={styles.playBtn}
+    disabled={loading}
+  >
+    {loading ? "Loading..." : "▶ Play Today's Prayer"}
+  </button>
+</div>
 
-
-        <div style={styles.controls}>
-          <button
-            type="button"
-            onClick={playTodayPrayer}
-            style={styles.playBtn}
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "▶ Play Today's Prayer"}
-          </button>
-        </div>
-
-        {message && <p style={styles.status}>{message}</p>}
-      </div>
+{message && <p style={styles.status}>{message}</p>}
 
     
 
@@ -168,7 +163,7 @@ hindiDay: "शनिवार",
 const styles = {
   container: {
     minHeight: "100vh",
-    padding: 18,
+    padding: "18px 14px 230px",
     color: "#fff",
     transition: "all 0.4s ease-in-out",
     display: "flex",
@@ -186,16 +181,17 @@ hindiDay: {
   fontWeight: 700,
   lineHeight: 1.1,
 },
-  deityImage: {
-    width: "76%",
-    height: 220,
-    objectFit: "cover",
-    objectPosition: "center 34%",
-    alignSelf: "center",
-    borderRadius: 18,
-    border: "1px solid rgba(255,215,128,0.45)",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.38)",
-  },
+ deityImage: {
+  width: "100%",
+  maxWidth: 430,
+  height: "auto",
+  display: "block",
+  objectFit: "contain",
+  alignSelf: "center",
+  borderRadius: 18,
+  border: "1px solid rgba(255,215,128,0.45)",
+  boxShadow: "0 10px 28px rgba(0,0,0,0.42)",
+},
 
   day: {
     fontSize: 26,
@@ -226,24 +222,24 @@ hindiDay: {
     fontSize: 13,
     opacity: 0.8,
   },
-
-  controls: {
-    display: "flex",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    gap: 10,
-    marginTop: 12,
-  },
-
+controls: {
+  width: "100%",
+  maxWidth: 430,
+  display: "flex",
+  justifyContent: "center",
+  marginTop: 2,
+},
   playBtn: {
-    background: "#1DB954",
-    border: "none",
-    padding: "10px 18px",
-    borderRadius: 999,
-    fontWeight: "bold",
-    cursor: "pointer",
-    color: "#000",
-  },
+  width: "100%",
+  background: "#1DB954",
+  border: "none",
+  padding: "13px 18px",
+  borderRadius: 999,
+  fontSize: 15,
+  fontWeight: "bold",
+  cursor: "pointer",
+  color: "#000",
+},
 
   resetBtn: {
     background: "rgba(255,255,255,0.15)",
@@ -260,18 +256,25 @@ hindiDay: {
   },
 
   card: {
-    background: "rgba(0,0,0,0.25)",
-    padding: 14,
-    borderRadius: 14,
-  },
+  width: "100%",
+  maxWidth: 430,
+  boxSizing: "border-box",
+  background: "rgba(0,0,0,0.25)",
+  padding: "15px 16px",
+  borderRadius: 14,
+  textAlign: "center",
+},
+
+
+
+
+
+
+
+
+
+
+
 };
-
-
-
-
-
-
-
-
 
 

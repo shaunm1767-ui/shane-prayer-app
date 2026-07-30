@@ -35,6 +35,10 @@ export default function NowPlayingBar() {
     playerState.currentTrack?.name ||
     "No track playing";
 
+  if (!playerState.currentTrack) {
+    return null;
+  }
+
   return (
     <div style={styles.container}>
       <div style={styles.trackInfo}>
@@ -160,4 +164,5 @@ stopButton: {
     fontSize: 16,
   },
 };
+
 

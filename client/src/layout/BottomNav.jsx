@@ -1,10 +1,8 @@
 export default function BottomNav({ current, setTab }) {
   const tabs = [
-    { id: "home", label: "Home", icon: "🏠" },
-    { id: "listen", label: "Listen", icon: "🎧" },
-    { id: "pray", label: "Pray", icon: "🙏" },
-    { id: "support", label: "Support", icon: "🤝" },
-    { id: "settings", label: "Settings", icon: "⚙️" },
+    { id: "home", label: "Home", icon: "\u{1F3E0}" },
+    { id: "pray", label: "Pray", icon: "\u{1F64F}" },
+    { id: "settings", label: "Help Us Grow", icon: "\u{2699}\u{FE0F}" },
   ];
 
   return (
@@ -15,6 +13,7 @@ export default function BottomNav({ current, setTab }) {
         return (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setTab(tab.id)}
             style={{
               ...styles.button,
@@ -45,38 +44,26 @@ const styles = {
     bottom: 0,
     left: 0,
     right: 0,
-
     height: 68,
-
     display: "flex",
     justifyContent: "space-around",
     alignItems: "center",
-
     background: "#181818",
-
     borderTop: "1px solid #282828",
-
     zIndex: 999,
   },
 
   button: {
     flex: 1,
-
     height: "100%",
-
     border: "none",
-
     background: "transparent",
-
     color: "#B3B3B3",
-
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-
     cursor: "pointer",
-
     transition: "all 0.2s ease",
   },
 

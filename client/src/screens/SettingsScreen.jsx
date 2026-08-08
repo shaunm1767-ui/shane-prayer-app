@@ -1,5 +1,4 @@
 import { signOut } from "firebase/auth";
-import Card from "../components/Card";
 import { auth } from "../firebase";
 
 export default function SettingsScreen() {
@@ -15,25 +14,25 @@ export default function SettingsScreen() {
   };
 
   const handleShare = async () => {
-  const shareData = {
-    title: "Shane Prayer",
-    text: "Join us for daily prayer, devotional music and spiritual guidance.",
-    url: "https://shane-prayer-app-2026-f2a3e.web.app",
+    const shareData = {
+      title: "Shane Prayer",
+      text: "Join us for daily prayer, devotional music and spiritual guidance.",
+      url: "https://shane-prayer-app-2026-f2a3e.web.app",
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        alert("Shane Prayer link copied.");
+      }
+    } catch (error) {
+      console.error("Share failed:", error);
+    }
   };
 
-  try {
-    if (navigator.share) {
-      await navigator.share(shareData);
-    } else {
-      await navigator.clipboard.writeText(shareData.url);
-      alert("Shane Prayer link copied.");
-    }
-  } catch (error) {
-    console.error("Share failed:", error);
-  }
-};
-
-const handleDonate = () => {
+  const handleDonate = () => {
     openGmail(
       "I'd like to support the Shane Prayer App",
       "Namaste,\n\nI'd like to support the Shane Prayer App.\n\nPlease send me more information about how I can contribute.\n"
@@ -63,84 +62,128 @@ const handleDonate = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <div style={styles.icon}>{"\u{1F64F}"}</div>
-        <div>
-          <h1 style={styles.heading}>Help Us Grow</h1>
+    <div style={styles.page}>
+      <div style={styles.container}>
+        <section style={styles.hero}>
+          <div style={styles.namasteRow}>
+            <span style={styles.om}>{"\u{1F549}\uFE0F"}</span>
+            <span style={styles.namaste}>Namaste</span>
+          </div>
+
+          <div style={styles.divider} />
+
+          <h1 style={styles.heading}>HELP US GROW</h1>
           <p style={styles.intro}>
-            Help us share prayer, devotional music and daily spiritual guidance.
+            Support the prayer journey and help Shane Prayer reach more people.
           </p>
-        </div>
-      </div>  <Card>
-    <h3>Share Shane Prayer</h3>
-    <p style={styles.copy}>
-      Share Shane Prayer with family, friends and your devotional community.
-    </p>
+        </section>
 
-    <button
-      type="button"
-      onClick={handleShare}
-      style={styles.primaryButton}
-    >
-      Share the App
-    </button>
-  </Card>
+        <section style={{ ...styles.card, ...styles.shareCard }}>
+          <div style={styles.iconWrap}>{"\u{1F4E4}"}</div>
 
+          <div style={styles.cardBody}>
+            <h2 style={{ ...styles.cardTitle, color: "#c98aff" }}>
+              SHARE SHANE PRAYER
+            </h2>
 
-      <Card>
-        <h3>Donate</h3>
-        <p style={styles.copy}>
-          Help us keep the app available and support future devotional content.
-        </p>
+            <p style={styles.copy}>
+              Share the app with family, friends and your devotional community.
+            </p>
 
-        <button
-          type="button"
-          onClick={handleDonate}
-          style={styles.primaryButton}
-        >
-          Donate
-        </button>
-      </Card>
+            <button
+              type="button"
+              onClick={handleShare}
+              style={styles.primaryButton}
+            >
+              Share the App
+            </button>
+          </div>
+        </section>
 
-      <Card>
-        <h3>Sponsor the App</h3>
-        <p style={styles.copy}>
-          Temples, businesses and individuals can sponsor future development.
-        </p>
+        <section style={{ ...styles.card, ...styles.donateCard }}>
+          <div style={styles.iconWrap}>{"\u{1F64F}"}</div>
 
-        <button
-          type="button"
-          onClick={handleSponsor}
-          style={styles.secondaryButton}
-        >
-          Become a Sponsor
-        </button>
-      </Card>
+          <div style={styles.cardBody}>
+            <h2 style={{ ...styles.cardTitle, color: "#e6ad4d" }}>
+              DONATE
+            </h2>
 
-      <Card>
-        <h3>Share a Suggestion</h3>
-        <p style={styles.copy}>
-          Help us improve future versions of the Shane Prayer App.
-        </p>
+            <p style={styles.copy}>
+              Help us keep Shane Prayer available and support future devotional
+              content.
+            </p>
 
-        <button
-          type="button"
-          onClick={handleSuggestion}
-          style={styles.secondaryButton}
-        >
-          Send Suggestion
-        </button>
-      </Card>
+            <button
+              type="button"
+              onClick={handleDonate}
+              style={styles.primaryButton}
+            >
+              Support Shane Prayer
+            </button>
+          </div>
+        </section>
 
-      <Card>
-        <h3>About Pundit Shane Maharaj</h3>
-    <p style={styles.copy}>
-      Pundit Shane Maharaj shares prayer, devotional music and spiritual
-      guidance through Satsang. Shane Prayer brings that experience into a
-      simple daily devotional space - helping people pause, pray, reflect
-      and reconnect.
-    </p>
+        <section style={{ ...styles.card, ...styles.sponsorCard }}>
+          <div style={styles.iconWrap}>{"\u{1F91D}"}</div>
+
+          <div style={styles.cardBody}>
+            <h2 style={{ ...styles.cardTitle, color: "#6bd38a" }}>
+              SPONSOR THE APP
+            </h2>
+
+            <p style={styles.copy}>
+              Temples, businesses and individuals can support future
+              development and devotional initiatives.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleSponsor}
+              style={styles.secondaryButton}
+            >
+              Become a Sponsor
+            </button>
+          </div>
+        </section>
+
+        <section style={{ ...styles.card, ...styles.suggestionCard }}>
+          <div style={styles.iconWrap}>{"\u{1F4AC}"}</div>
+
+          <div style={styles.cardBody}>
+            <h2 style={{ ...styles.cardTitle, color: "#69aafc" }}>
+              SHARE A SUGGESTION
+            </h2>
+
+            <p style={styles.copy}>
+              Help us improve future versions of Shane Prayer.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleSuggestion}
+              style={styles.secondaryButton}
+            >
+              Send Suggestion
+            </button>
+          </div>
+        </section>
+
+        <section style={{ ...styles.card, ...styles.aboutCard }}>
+          <div style={styles.iconWrap}>{"\u{1F549}\uFE0F"}</div>
+
+          <div style={styles.cardBody}>
+            <h2 style={{ ...styles.cardTitle, color: "#f1d7a1" }}>
+              ABOUT PUNDIT SHANE MAHARAJ
+            </h2>
+
+            <p style={styles.copy}>
+              Pundit Shane Maharaj shares prayer, devotional music and spiritual
+              guidance through Satsang. Shane Prayer brings that experience into
+              a simple daily devotional space - helping people pause, pray,
+              reflect and reconnect.
+            </p>
+          </div>
+        </section>
 
         <button
           type="button"
@@ -149,83 +192,175 @@ const handleDonate = () => {
         >
           Logout
         </button>
-      </Card>
+      </div>
     </div>
   );
 }
 
 const styles = {
-  container: {
-    padding: 20,
+  page: {
+    minHeight: "100%",
+    padding: "18px 14px 34px",
     color: "#fff",
   },
 
-  header: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 12,
-    marginBottom: 18,
+  container: {
+    width: "100%",
+    maxWidth: 460,
+    margin: "0 auto",
   },
 
-  icon: {
-    fontSize: 28,
+  hero: {
+    textAlign: "center",
+    padding: "8px 8px 22px",
+  },
+
+  namasteRow: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 14,
+  },
+
+  om: {
+    fontSize: 40,
     lineHeight: 1,
+    color: "#d6a84b",
+  },
+
+  namaste: {
+    fontSize: 28,
+    fontWeight: 700,
+    color: "#d6a84b",
+    letterSpacing: 0.4,
+  },
+
+  divider: {
+    width: "56%",
+    maxWidth: 220,
+    height: 1,
+    margin: "0 auto 18px",
+    background: "rgba(214,168,75,0.45)",
   },
 
   heading: {
-    fontSize: 24,
     margin: 0,
+    fontSize: 24,
+    letterSpacing: 1.4,
+    color: "#f1d7a1",
   },
 
   intro: {
-    marginTop: 6,
+    margin: "7px auto 0",
+    maxWidth: 360,
     color: "#c7c7c7",
     fontSize: 14,
     lineHeight: 1.5,
   },
 
-  copy: {
-    color: "#bdbdbd",
-    fontSize: 14,
-    lineHeight: 1.5,
+  card: {
+    display: "flex",
+    gap: 16,
+    alignItems: "flex-start",
+    padding: 18,
+    marginBottom: 16,
+    borderRadius: 20,
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "#171720",
+    boxSizing: "border-box",
   },
 
-  ready: {
-    color: "#1DB954",
-    fontWeight: 600,
+  shareCard: {
+    borderColor: "rgba(173,104,240,0.35)",
+    background: "rgba(70,38,95,0.22)",
+  },
+
+  donateCard: {
+    borderColor: "rgba(225,143,43,0.38)",
+    background: "rgba(84,54,20,0.22)",
+  },
+
+  sponsorCard: {
+    borderColor: "rgba(74,179,105,0.38)",
+    background: "rgba(25,78,45,0.22)",
+  },
+
+  suggestionCard: {
+    borderColor: "rgba(75,140,221,0.4)",
+    background: "rgba(25,55,92,0.24)",
+  },
+
+  aboutCard: {
+    borderColor: "rgba(214,168,75,0.3)",
+    background: "rgba(70,54,28,0.18)",
+  },
+
+  iconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    background: "rgba(255,255,255,0.07)",
+    fontSize: 25,
+  },
+
+  cardBody: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  cardTitle: {
+    margin: "2px 0 8px",
+    fontSize: 17,
+    letterSpacing: 0.5,
+  },
+
+  copy: {
+    margin: 0,
+    color: "#e0e0e0",
+    fontSize: 14,
+    lineHeight: 1.55,
   },
 
   primaryButton: {
     width: "100%",
-    padding: "12px 16px",
-    border: "none",
+    marginTop: 14,
+    padding: "11px 14px",
+    border: "1px solid rgba(241,205,105,0.45)",
     borderRadius: 10,
     background: "#d6a84b",
-    color: "#111",
+    color: "#17110a",
+    fontSize: 13,
     fontWeight: 700,
     cursor: "pointer",
   },
 
   secondaryButton: {
     width: "100%",
-    padding: "12px 16px",
+    marginTop: 14,
+    padding: "11px 14px",
     border: "1px solid rgba(255,255,255,0.16)",
     borderRadius: 10,
-    background: "#2a2a35",
+    background: "rgba(255,255,255,0.06)",
     color: "#fff",
+    fontSize: 13,
     fontWeight: 700,
     cursor: "pointer",
   },
 
   logoutButton: {
-    width: "100%",
-    marginTop: 12,
-    padding: "12px 16px",
-    border: "none",
-    borderRadius: 10,
-    background: "#8f2d2d",
-    color: "#fff",
-    fontWeight: 700,
+    display: "block",
+    margin: "6px auto 0",
+    padding: "9px 22px",
+    border: "1px solid rgba(255,255,255,0.15)",
+    borderRadius: 999,
+    background: "transparent",
+    color: "#aaa",
+    fontSize: 12,
     cursor: "pointer",
   },
 };

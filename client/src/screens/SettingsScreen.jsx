@@ -1,4 +1,4 @@
-﻿import { signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import Card from "../components/Card";
 import { auth } from "../firebase";
 
@@ -14,7 +14,26 @@ export default function SettingsScreen() {
     window.open(gmailUrl, "_blank", "noopener,noreferrer");
   };
 
-  const handleDonate = () => {
+  const handleShare = async () => {
+  const shareData = {
+    title: "Shane Prayer",
+    text: "Join us for daily prayer, devotional music and spiritual guidance.",
+    url: "https://shane-prayer-app-2026-f2a3e.web.app",
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else {
+      await navigator.clipboard.writeText(shareData.url);
+      alert("Shane Prayer link copied.");
+    }
+  } catch (error) {
+    console.error("Share failed:", error);
+  }
+};
+
+const handleDonate = () => {
     openGmail(
       "I'd like to support the Shane Prayer App",
       "Namaste,\n\nI'd like to support the Shane Prayer App.\n\nPlease send me more information about how I can contribute.\n"
@@ -46,14 +65,28 @@ export default function SettingsScreen() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <div style={styles.icon}>🙏</div>
+        <div style={styles.icon}>ðŸ™</div>
         <div>
           <h1 style={styles.heading}>Help Us Grow</h1>
           <p style={styles.intro}>
             Help us share prayer, devotional music and daily spiritual guidance.
           </p>
         </div>
-      </div>
+      </div>  <Card>
+    <h3>Share Shane Prayer</h3>
+    <p style={styles.copy}>
+      Share Shane Prayer with family, friends and your devotional community.
+    </p>
+
+    <button
+      type="button"
+      onClick={handleShare}
+      style={styles.primaryButton}
+    >
+      Share the App
+    </button>
+  </Card>
+
 
       <Card>
         <h3>Donate</h3>
@@ -101,10 +134,13 @@ export default function SettingsScreen() {
       </Card>
 
       <Card>
-        <h3>About</h3>
-        <p>Shane Prayer App MVP v1</p>
-        <p style={styles.ready}>● Firebase Connected</p>
-        <p style={styles.ready}>● Audio Ready</p>
+        <h3>About Pundit Shane Maharaj</h3>
+    <p style={styles.copy}>
+      Pundit Shane Maharaj shares prayer, devotional music and spiritual
+      guidance through Satsang. Shane Prayer brings that experience into a
+      simple daily devotional space - helping people pause, pray, reflect
+      and reconnect.
+    </p>
 
         <button
           type="button"

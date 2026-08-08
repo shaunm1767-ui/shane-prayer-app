@@ -65,7 +65,7 @@ const handleDonate = () => {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <div style={styles.icon}>ðŸ™</div>
+        <div style={styles.icon}>Ã°Å¸â„¢Â</div>
         <div>
           <h1 style={styles.heading}>Help Us Grow</h1>
           <p style={styles.intro}>

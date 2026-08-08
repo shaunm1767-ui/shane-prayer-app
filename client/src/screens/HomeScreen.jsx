@@ -1,202 +1,209 @@
-﻿import { useEffect, useState } from "react";
-import playlistController from "../core/playlistController";
-import { loadFirebasePlaylist } from "../firebasePlaylistScanner";
-
 export default function HomeScreen() {
-  const [playlist, setPlaylist] = useState([]);
-  const [currentTrack, setCurrentTrack] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadTracks() {
-      setLoading(true);
-      setLoadError("");
-
-      const tracks = await loadFirebasePlaylist("aarti");
-
-      if (!active) return;
-
-      setPlaylist(tracks);
-      setLoading(false);
-
-      if (!tracks.length) {
-        setLoadError("No devotional tracks were found.");
-      }
-    }
-
-    loadTracks();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const playTrack = (track, index) => {
-    console.log("[HOME] Playing track:", track);
-
-    playlistController.load(playlist, index);
-    setCurrentTrack(track);
-  };
-
-  const playFeatured = () => {
-    if (!playlist.length) return;
-    playTrack(playlist[0], 0);
-  };
-
-  const pause = (event) => {
-    event.stopPropagation();
-    playlistController.pause();
-  };
-
-  const clear = (event) => {
-    event.stopPropagation();
-    playlistController.clear();
-    setCurrentTrack(null);
-  };
-
   return (
-    <div style={styles.container}>
-      <div style={styles.hero}>
-        <h2 style={styles.title}>Good Evening</h2>
-        <p style={styles.subtitle}>
-          Welcome back to your devotional space
-        </p>
-      </div>
+    <div style={styles.page}>
+      <div style={styles.container}>
+        <section style={styles.hero}>
+          <div style={styles.namasteRow}>
+            <span style={styles.om}>{"\u{1F549}\uFE0F"}</span>
+            <span style={styles.namaste}>Namaste</span>
+          </div>
 
-      <div style={styles.featured}>
-        <h3>Featured Prayer</h3>
-        <p>Start your day with calm reflection and grounding.</p>
+          <div style={styles.divider} />
 
-        <button
-          style={styles.primaryBtn}
-          onClick={playFeatured}
-          disabled={loading || !playlist.length}
-        >
-          {loading ? "Loading prayers..." : "▶ Play Featured"}
-        </button>
-      </div>
+          <h1 style={styles.title}>SATSANG GUIDANCE</h1>
+          <p style={styles.subtitle}>Wisdom for everyday life</p>
+        </section>
 
-      <div style={styles.section}>
-        <h3 style={styles.sectionTitle}>Your Playlist</h3>
+        <section style={{ ...styles.card, ...styles.specialCard }}>
+          <div style={styles.iconWrap}>{"\u{1F6D5}"}</div>
+          <div style={styles.cardBody}>
+            <h2 style={{ ...styles.cardTitle, color: "#c98aff" }}>
+              SPECIAL DATES
+            </h2>
+            <p style={styles.cardText}>
+              Upcoming observances and important prayer days.
+            </p>
+            <div style={styles.badge}>Next dates coming soon</div>
+          </div>
+        </section>
 
-        {loadError && (
-          <p style={styles.error}>{loadError}</p>
-        )}
+        <section style={{ ...styles.card, ...styles.fastCard }}>
+          <div style={styles.iconWrap}>{"\u{1FA94}"}</div>
+          <div style={styles.cardBody}>
+            <h2 style={{ ...styles.cardTitle, color: "#f2a43c" }}>
+              WHY WE FAST
+            </h2>
+            <p style={styles.cardText}>
+              Fasting is more than food. It develops discipline, quietens the
+              mind and helps us turn our attention toward God.
+            </p>
+          </div>
+        </section>
 
-        {playlist.map((track, index) => {
-          const active = currentTrack?.id === track.id;
+        <section style={{ ...styles.card, ...styles.disciplineCard }}>
+          <div style={styles.iconWrap}>{"\u{1F9D8}"}</div>
+          <div style={styles.cardBody}>
+            <h2 style={{ ...styles.cardTitle, color: "#6bd38a" }}>
+              SPIRITUAL DISCIPLINE
+            </h2>
+            <p style={styles.cardText}>
+              Small daily practices of prayer, gratitude, reflection and
+              self-control help build a focused and purposeful life.
+            </p>
+          </div>
+        </section>
 
-          return (
-            <div
-              key={track.id}
-              onClick={() => playTrack(track, index)}
-              style={{
-                ...styles.trackCard,
-                background: active ? "#2a2a2a" : "#1a1a1a",
-                borderColor: active ? "#1DB954" : "#2f2f2f",
-              }}
-            >
-              <div>
-                🎵 {track.title}
-              </div>
-
-              <div style={styles.trackActions}>
-                {active && (
-                  <button onClick={pause} style={styles.smallBtn}>
-                    ⏸
-                  </button>
-                )}
-
-                <button onClick={clear} style={styles.smallBtn}>
-                  🗑
-                </button>
-              </div>
-            </div>
-          );
-        })}
+        <section style={{ ...styles.card, ...styles.howToCard }}>
+          <div style={styles.iconWrap}>{"\u{1F4D6}"}</div>
+          <div style={styles.cardBody}>
+            <h2 style={{ ...styles.cardTitle, color: "#69aafc" }}>
+              HOW TO...
+            </h2>
+            <p style={styles.listItem}>• Prepare for prayer</p>
+            <p style={styles.listItem}>• Begin a fast</p>
+            <p style={styles.listItem}>• Create a daily prayer routine</p>
+          </div>
+        </section>
       </div>
     </div>
   );
 }
 
 const styles = {
-  container: {
-    padding: 16,
+  page: {
+    minHeight: "100%",
+    padding: "18px 14px 30px",
     color: "#fff",
+  },
+
+  container: {
+    width: "100%",
+    maxWidth: 460,
+    margin: "0 auto",
   },
 
   hero: {
-    marginBottom: 16,
+    textAlign: "center",
+    padding: "8px 8px 22px",
+  },
+
+  namasteRow: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 14,
+  },
+
+  om: {
+    fontSize: 40,
+    lineHeight: 1,
+    color: "#d6a84b",
+  },
+
+  namaste: {
+    fontSize: 28,
+    fontWeight: 700,
+    color: "#d6a84b",
+    letterSpacing: 0.4,
+  },
+
+  divider: {
+    width: "56%",
+    maxWidth: 220,
+    height: 1,
+    margin: "0 auto 18px",
+    background: "rgba(214,168,75,0.45)",
   },
 
   title: {
-    fontSize: 22,
-    marginBottom: 4,
+    margin: 0,
+    fontSize: 24,
+    letterSpacing: 1.4,
+    color: "#f1d7a1",
   },
 
   subtitle: {
-    fontSize: 13,
-    color: "#aaa",
+    margin: "7px 0 0",
+    color: "#c7c7c7",
+    fontSize: 15,
   },
 
-  featured: {
-    background: "#1a1a22",
-    padding: 14,
-    borderRadius: 12,
+  card: {
+    display: "flex",
+    gap: 16,
+    alignItems: "flex-start",
+    padding: 18,
+    borderRadius: 20,
     marginBottom: 16,
-    border: "1px solid #2a2a35",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "#171720",
   },
 
-  primaryBtn: {
-    marginTop: 10,
-    padding: 10,
-    width: "100%",
-    borderRadius: 10,
-    border: "none",
-    background: "#1DB954",
-    color: "#000",
-    fontWeight: "bold",
-    cursor: "pointer",
+  specialCard: {
+    borderColor: "rgba(173,104,240,0.35)",
+    background: "rgba(70,38,95,0.22)",
   },
 
-  section: {
-    marginTop: 10,
+  fastCard: {
+    borderColor: "rgba(225,143,43,0.38)",
+    background: "rgba(84,54,20,0.22)",
   },
 
-  sectionTitle: {
-    marginBottom: 10,
+  disciplineCard: {
+    borderColor: "rgba(74,179,105,0.38)",
+    background: "rgba(25,78,45,0.22)",
   },
 
-  error: {
-    color: "#ff8a8a",
-    fontSize: 13,
+  howToCard: {
+    borderColor: "rgba(75,140,221,0.4)",
+    background: "rgba(25,55,92,0.24)",
   },
 
-  trackCard: {
-    padding: 12,
-    borderRadius: 10,
-    border: "1px solid #2f2f2f",
-    marginBottom: 10,
+  iconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     display: "flex",
-    justifyContent: "space-between",
     alignItems: "center",
-    cursor: "pointer",
+    justifyContent: "center",
+    flexShrink: 0,
+    background: "rgba(255,255,255,0.07)",
+    fontSize: 27,
   },
 
-  trackActions: {
-    display: "flex",
-    gap: 8,
+  cardBody: {
+    flex: 1,
+    minWidth: 0,
   },
 
-  smallBtn: {
-    border: "none",
-    background: "#333",
-    color: "#fff",
-    padding: "4px 8px",
-    borderRadius: 6,
-    cursor: "pointer",
+  cardTitle: {
+    margin: "2px 0 8px",
+    fontSize: 18,
+    letterSpacing: 0.6,
+  },
+
+  cardText: {
+    margin: 0,
+    color: "#e0e0e0",
+    fontSize: 14,
+    lineHeight: 1.55,
+  },
+
+  badge: {
+    display: "inline-block",
+    marginTop: 12,
+    padding: "6px 10px",
+    borderRadius: 9,
+    background: "rgba(173,104,240,0.15)",
+    color: "#d2a3ff",
+    fontSize: 12,
+  },
+
+  listItem: {
+    margin: "4px 0",
+    color: "#e0e0e0",
+    fontSize: 14,
+    lineHeight: 1.45,
   },
 };

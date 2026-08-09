@@ -227,6 +227,7 @@ controls: {
   maxWidth: 430,
   display: "flex",
   justifyContent: "center",
+  alignSelf: "center",
   marginTop: 2,
 },
   playBtn: {
@@ -258,6 +259,7 @@ controls: {
   card: {
   width: "100%",
   maxWidth: 430,
+  alignSelf: "center",
   boxSizing: "border-box",
   background: "rgba(0,0,0,0.25)",
   padding: "15px 16px",

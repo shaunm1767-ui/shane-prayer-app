@@ -125,17 +125,22 @@ hindiDay: "शनिवार",
 
   return (
     <div style={{ ...styles.container, background: today.theme }}>
-      <div style={styles.header}>
-  <div style={styles.hindiDay}>{today.hindiDay}</div>
-  <h2 style={styles.day}>🕉️ {today.day}</h2>
-  <p style={styles.focus}>{today.focus}</p>
-</div>
 
-      <img
-        src={today.image}
-        alt={`${today.day} devotional deity`}
-        style={styles.deityImage}
-      />
+
+      <div style={styles.imageWrap}>
+        <img
+          src={today.image}
+          alt={`${today.day} devotional deity`}
+          style={styles.deityImage}
+        />
+
+        {day === 0 && (
+          <div style={styles.tyagOverlay}>
+            <div style={styles.tyagTitle}>TYAG</div>
+            <div style={styles.tyagMeaning}>Thank You All Good</div>
+          </div>
+        )}
+      </div>
 
      <div style={styles.controls}>
   <button
@@ -181,7 +186,46 @@ hindiDay: {
   fontWeight: 700,
   lineHeight: 1.1,
 },
- deityImage: {
+ imageWrap: {
+  width: "100%",
+  maxWidth: 430,
+  position: "relative",
+  alignSelf: "center",
+},
+
+tyagOverlay: {
+  position: "absolute",
+  left: "2.2%",
+  right: "2.2%",
+  bottom: "2.5%",
+  height: "13.2%",
+  boxSizing: "border-box",
+  borderRadius: 12,
+  border: "1px solid rgba(255,190,45,0.85)",
+  background: "linear-gradient(135deg, #651010, #3d0606)",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  color: "#f7cf62",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.32)",
+},
+
+tyagTitle: {
+  fontSize: 24,
+  lineHeight: 1,
+  fontWeight: 800,
+  letterSpacing: 4,
+},
+
+tyagMeaning: {
+  marginTop: 6,
+  fontSize: 13,
+  color: "#fff7df",
+  fontWeight: 600,
+},
+
+deityImage: {
   width: "100%",
   maxWidth: 430,
   height: "auto",

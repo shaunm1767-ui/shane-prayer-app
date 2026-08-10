@@ -1,4 +1,12 @@
+import { useState } from "react";
+import {
+  hinduFestivals2026,
+  getNextFestival,
+  formatFestivalDate,
+} from "../data/hinduCalendar2026";
 export default function HomeScreen() {
+  const [showCalendar, setShowCalendar] = useState(false);
+  const nextFestival = getNextFestival();
   return (
     <div style={styles.page}>
       <div style={styles.container}>
@@ -23,7 +31,58 @@ export default function HomeScreen() {
             <p style={styles.cardText}>
               Upcoming observances and important prayer days.
             </p>
-            <div style={styles.badge}>Next dates coming soon</div>
+                    {nextFestival && (
+          <div style={styles.nextFestival}>
+            <div style={styles.nextLabel}>NEXT OBSERVANCE</div>
+            <div style={styles.nextName}>{nextFestival.name}</div>
+            <div style={styles.nextDate}>
+              {formatFestivalDate(nextFestival.date)}
+            </div>
+
+            {nextFestival.note && (
+              <div style={styles.nextNote}>{nextFestival.note}</div>
+            )}
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setShowCalendar((open) => !open)}
+          style={styles.calendarButton}
+        >
+          {showCalendar ? "Hide 2026 Calendar ▲" : "View 2026 Calendar ▼"}
+        </button>
+
+        {showCalendar && (
+          <div style={styles.calendarList}>
+            {hinduFestivals2026.map((festival, index) => (
+              <div
+                key={`${festival.name}-${festival.date}-${index}`}
+                style={styles.calendarRow}
+              >
+                <div style={styles.calendarDate}>
+                  {formatFestivalDate(festival.date)}
+                </div>
+
+                <div style={styles.calendarName}>
+                  {festival.name}
+                </div>
+
+                {festival.endDate && (
+                  <div style={styles.calendarMeta}>
+                    Until {formatFestivalDate(festival.endDate)}
+                  </div>
+                )}
+
+                {festival.note && (
+                  <div style={styles.calendarMeta}>
+                    {festival.note}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
           </div>
         </section>
 
@@ -188,6 +247,88 @@ const styles = {
     color: "#e0e0e0",
     fontSize: 14,
     lineHeight: 1.55,
+  },
+
+  nextFestival: {
+    marginTop: 14,
+    padding: "12px 13px",
+    borderRadius: 14,
+    background: "rgba(173,104,240,0.11)",
+    border: "1px solid rgba(173,104,240,0.25)",
+  },
+
+  nextLabel: {
+    color: "#c98aff",
+    fontSize: 10,
+    fontWeight: 800,
+    letterSpacing: 1.2,
+    marginBottom: 5,
+  },
+
+  nextName: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: 700,
+    lineHeight: 1.3,
+  },
+
+  nextDate: {
+    marginTop: 4,
+    color: "#e3c6ff",
+    fontSize: 13,
+  },
+
+  nextNote: {
+    marginTop: 5,
+    color: "#cfcfcf",
+    fontSize: 11,
+    lineHeight: 1.4,
+  },
+
+  calendarButton: {
+    width: "100%",
+    marginTop: 12,
+    padding: "10px 12px",
+    borderRadius: 12,
+    border: "1px solid rgba(173,104,240,0.3)",
+    background: "rgba(173,104,240,0.14)",
+    color: "#d9b4ff",
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+
+  calendarList: {
+    marginTop: 10,
+    maxHeight: 340,
+    overflowY: "auto",
+    paddingRight: 3,
+  },
+
+  calendarRow: {
+    padding: "11px 4px",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+  },
+
+  calendarDate: {
+    color: "#c98aff",
+    fontSize: 11,
+    fontWeight: 700,
+    marginBottom: 3,
+  },
+
+  calendarName: {
+    color: "#f2f2f2",
+    fontSize: 13,
+    fontWeight: 600,
+    lineHeight: 1.35,
+  },
+
+  calendarMeta: {
+    marginTop: 3,
+    color: "#bdbdbd",
+    fontSize: 11,
+    lineHeight: 1.4,
   },
 
   badge: {

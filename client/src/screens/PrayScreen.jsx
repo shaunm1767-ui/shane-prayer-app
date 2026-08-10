@@ -6,7 +6,9 @@ export default function PrayScreen() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const day = new Date().getDay();
+const realDay = new Date().getDay();
+const [devDay, setDevDay] = useState(realDay);
+const day = devDay;
 
   const guidance = {
     0: {
@@ -16,7 +18,7 @@ hindiDay: "रविवार",
       focus: "Surya – Energy & Clarity",
       mantra: "Om Suryaya Namaha",
       message: "Reset your energy and focus on clarity.",
-      reflection: "What do I need clarity on this week?",
+      reflection: "May I enter this week with clarity, positive energy and purpose.",
       folder: "aarti",
       match: "uniserval",
       theme: "linear-gradient(135deg, #ffb347, #ffcc33)",
@@ -28,7 +30,7 @@ hindiDay: "सोमवार",
       focus: "Shiva – Calm & Stillness",
       mantra: "Om Namah Shivaya",
       message: "Let go of stress and return to peace.",
-      reflection: "What am I holding onto unnecessarily?",
+      reflection: "May Lord Shiva always protect me, my family and bring peace into our lives.",
       folder: "aarti",
       match: "shiv",
       theme: "linear-gradient(135deg, #1c1c1c, #434343)",
@@ -40,7 +42,7 @@ hindiDay: "मंगलवार",
       focus: "Hanuman – Strength & Courage",
       mantra: "Om Hanumate Namaha",
       message: "Face challenges with courage and discipline.",
-      reflection: "Where do I need strength today?",
+      reflection: "May I always have the courage and strength to face whatever comes my way.",
       folder: "aarti",
       match: "hanuman",
       theme: "linear-gradient(135deg, #ff4e50, #f9d423)",
@@ -52,7 +54,7 @@ hindiDay: "बुधवार",
       focus: "Ganesha – Wisdom & Flow",
       mantra: "Om Gan Ganapataye Namaha",
       message: "Remove obstacles and gain clarity.",
-      reflection: "What is blocking my progress?",
+      reflection: "May obstacles be removed from my path and may I move forward with wisdom and confidence.",
       folder: "aarti",
       match: "ganesh",
       theme: "linear-gradient(135deg, #43cea2, #185a9d)",
@@ -64,7 +66,7 @@ hindiDay: "गुरुवार",
       focus: "Guru – Guidance & Learning",
       mantra: "Om Namo Bhagavate Vasudevaya",
       message: "Stay open to wisdom and guidance.",
-      reflection: "Who is guiding me right now?",
+      reflection: "May I always recognise the guidance, wisdom and blessings placed before me.",
       folder: "bhajan",
       match: "gurucharanan",
       theme: "linear-gradient(135deg, #2193b0, #6dd5ed)",
@@ -76,7 +78,7 @@ hindiDay: "शुक्रवार",
       focus: "Lakshmi – Abundance & Gratitude",
       mantra: "Om Shreem Mahalakshmiyei Namaha",
       message: "Focus on gratitude and abundance.",
-      reflection: "What am I grateful for today?",
+      reflection: "May my home and family be blessed with abundance, gratitude, peace and happiness.",
       folder: "aarti",
       match: "luxmi",
       theme: "linear-gradient(135deg, #f7971e, #ffd200)",
@@ -88,7 +90,7 @@ hindiDay: "शनिवार",
       focus: "Shani – Discipline & Karma",
       mantra: "Om Sham Shanicharaya Namaha",
       message: "Stay grounded and disciplined.",
-      reflection: "Where do I need structure?",
+      reflection: "May I have the patience and discipline to do what is right and trust the journey ahead.",
       folder: "aarti",
       match: "uniserval",
       theme: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
@@ -127,7 +129,23 @@ hindiDay: "शनिवार",
     <div style={{ ...styles.container, background: today.theme }}>
 
 
-      <div style={styles.imageWrap}>
+      <div style={styles.devDaySwitcher}>
+    {[0, 1, 2, 3, 4, 5, 6].map((d) => (
+      <button
+        key={d}
+        type="button"
+        onClick={() => setDevDay(d)}
+        style={{
+          ...styles.devDayButton,
+          ...(day === d ? styles.devDayButtonActive : {}),
+        }}
+      >
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d]}
+      </button>
+    ))}
+  </div>
+
+  <div style={styles.imageWrap}>
         <img
           src={today.image}
           alt={`${today.day} devotional deity`}
@@ -158,7 +176,7 @@ hindiDay: "शनिवार",
     
 
       <div style={styles.card}>
-        <h3>My Conversations with GOD</h3>
+        <h3>REFLECTION</h3>
         <p>{today.reflection}</p>
       </div>
     </div>
@@ -186,7 +204,33 @@ hindiDay: {
   fontWeight: 700,
   lineHeight: 1.1,
 },
- imageWrap: {
+ devDaySwitcher: {
+  width: "100%",
+  maxWidth: 430,
+  alignSelf: "center",
+  display: "grid",
+  gridTemplateColumns: "repeat(7, 1fr)",
+  gap: 4,
+  marginBottom: 8,
+},
+
+devDayButton: {
+  padding: "7px 2px",
+  borderRadius: 8,
+  border: "1px solid rgba(255,255,255,0.18)",
+  background: "rgba(0,0,0,0.28)",
+  color: "#fff",
+  fontSize: 11,
+  cursor: "pointer",
+},
+
+devDayButtonActive: {
+  background: "#d6a84b",
+  color: "#111",
+  fontWeight: 700,
+},
+
+imageWrap: {
   width: "100%",
   maxWidth: 430,
   position: "relative",

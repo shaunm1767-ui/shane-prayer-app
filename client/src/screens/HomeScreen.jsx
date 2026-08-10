@@ -6,6 +6,7 @@ import {
 } from "../data/hinduCalendar2026";
 export default function HomeScreen() {
   const [showCalendar, setShowCalendar] = useState(false);
+  const [openGuide, setOpenGuide] = useState(null);
   const nextFestival = getNextFestival();
   return (
     <div style={styles.page}>
@@ -118,9 +119,69 @@ export default function HomeScreen() {
             <h2 style={{ ...styles.cardTitle, color: "#69aafc" }}>
               HOW TO...
             </h2>
-            <p style={styles.listItem}>• Prepare for prayer</p>
-            <p style={styles.listItem}>• Begin a fast</p>
-            <p style={styles.listItem}>• Create a daily prayer routine</p>
+            <p style={styles.cardText}>
+              Simple guidance for everyday Hindu practice.
+            </p>
+
+            <button
+              type="button"
+              onClick={() =>
+                setOpenGuide(openGuide === "prayer" ? null : "prayer")
+              }
+              style={styles.guideButton}
+            >
+              <span>Prepare for Prayer</span>
+              <span>{openGuide === "prayer" ? "▲" : "▼"}</span>
+            </button>
+
+            {openGuide === "prayer" && (
+              <div style={styles.guideContent}>
+                Find a clean, quiet space. Wash your hands and face and settle
+                yourself. Light a lamp or incense if appropriate. Take a moment
+                to quieten the mind, then begin your prayer with sincerity and
+                devotion.
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() =>
+                setOpenGuide(openGuide === "fast" ? null : "fast")
+              }
+              style={styles.guideButton}
+            >
+              <span>Begin a Fast</span>
+              <span>{openGuide === "fast" ? "▲" : "▼"}</span>
+            </button>
+
+            {openGuide === "fast" && (
+              <div style={styles.guideContent}>
+                Fasting is a spiritual discipline, not simply avoiding food.
+                Begin with a clear intention, keep your thoughts and actions
+                peaceful, make time for prayer, and complete the fast according
+                to your family or spiritual tradition.
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() =>
+                setOpenGuide(openGuide === "routine" ? null : "routine")
+              }
+              style={styles.guideButton}
+            >
+              <span>Create a Daily Prayer Routine</span>
+              <span>{openGuide === "routine" ? "▲" : "▼"}</span>
+            </button>
+
+            {openGuide === "routine" && (
+              <div style={styles.guideContent}>
+                Choose a regular time and a quiet place. Begin with a few moments
+                of stillness, offer your prayer or mantra, spend time in gratitude,
+                and finish with a simple reflection. Consistency is more important
+                than length.
+              </div>
+            )}
           </div>
         </section>
       </div>
@@ -339,6 +400,35 @@ const styles = {
     background: "rgba(173,104,240,0.15)",
     color: "#d2a3ff",
     fontSize: 12,
+  },
+
+  guideButton: {
+    width: "100%",
+    marginTop: 10,
+    padding: "11px 12px",
+    borderRadius: 12,
+    border: "1px solid rgba(75,140,221,0.30)",
+    background: "rgba(75,140,221,0.12)",
+    color: "#d7e7ff",
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+    textAlign: "left",
+  },
+
+  guideContent: {
+    marginTop: 7,
+    padding: "11px 12px",
+    borderRadius: 12,
+    background: "rgba(0,0,0,0.18)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    color: "#dedede",
+    fontSize: 13,
+    lineHeight: 1.55,
   },
 
   listItem: {

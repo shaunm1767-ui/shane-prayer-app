@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
 import playlistController from "../core/playlistController";
-import { loadFirebasePlaylist } from "../firebasePlaylistScanner";
+import { buildDailyAudioQueue } from "../data/dailyAudioQueue";
 
 export default function PrayScreen() {
   const [loading, setLoading] = useState(false);
@@ -105,23 +105,27 @@ hindiDay: "शनिवार",
     setLoading(true);
     setMessage("");
 
-    const tracks = await loadFirebasePlaylist(today.folder);
+    try {
+      const { queue, missing } = await buildDailyAudioQueue(day);
 
-    if (!tracks.length) {
+      if (!queue.length) {
+        setMessage("Today's prayer audio could not be loaded.");
+        return;
+      }
+
+      playlistController.load(queue, 0);
+
+      setMessage(`Now playing: ${queue[0].title}`);
+
+      if (missing.length) {
+        console.warn("[PRAY AUDIO] Missing planned tracks:", missing);
+      }
+    } catch (error) {
+      console.error("[PRAY AUDIO] Daily queue failed:", error);
       setMessage("Today's prayer audio could not be loaded.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const matchedTrack =
-      tracks.find((track) =>
-        track.title.toLowerCase().includes(today.match.toLowerCase())
-      ) || tracks[0];
-
-    playlistController.load([matchedTrack], 0);
-
-    setMessage(`Now playing: ${matchedTrack.title}`);
-    setLoading(false);
   };
 
 

@@ -1,4 +1,4 @@
-import { signOut } from "firebase/auth";
+﻿import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 
 export default function SettingsScreen() {
@@ -169,18 +169,77 @@ export default function SettingsScreen() {
         </section>
 
         <section style={{ ...styles.card, ...styles.aboutCard }}>
-          <div style={styles.iconWrap}>{"\u{1F549}\uFE0F"}</div>
+          <div style={styles.bioBody}>
+            <img
+              src="/images/shane/shane-portrait.jpeg"
+              alt="Pundith Shane Maharaj"
+              style={styles.bioPortrait}
+            />
 
-          <div style={styles.cardBody}>
-            <h2 style={{ ...styles.cardTitle, color: "#f1d7a1" }}>
-              ABOUT PUNDIT SHANE MAHARAJ
-            </h2>
+            <h2 style={styles.bioTitle}>Pundith Shane Maharaj</h2>
 
-            <p style={styles.copy}>
-              Pundit Shane Maharaj shares prayer, devotional music and spiritual
-              guidance through Satsang. Shane Prayer brings that experience into
-              a simple daily devotional space - helping people pause, pray,
-              reflect and reconnect.
+            <p style={styles.bioCopy}>
+              The story begins more than a century ago, when Indians first arrived
+              on South African shores, bringing with them their faith, culture and
+              traditions.
+            </p>
+
+            <p style={styles.bioCopy}>
+              Despite generations living far from India, that heritage has endured.
+              It remains alive today in South African Indian families - passed from
+              one generation to the next through prayer, ritual, tradition and a
+              shared sense of identity.
+            </p>
+
+            <p style={styles.bioHighlight}>
+              Pundith Shane Maharaj has dedicated his life to keeping that flame burning.
+            </p>
+
+            <p style={styles.bioCopy}>
+              His spiritual journey began at the tender age of six, learning from
+              his father, PA Maharaj, and his uncle, SM Maharaj. That journey has
+              now spanned more than seven decades, during which he has devoted
+              himself to preserving the rich Hindu culture and traditions inherited
+              from our ancestors.
+            </p>
+
+            <p style={styles.bioCopy}>
+              What distinguishes Pundith Shane is his ability to bring together
+              orthodox Hindu rituals with a practical way of life - helping people
+              understand not only the rituals of their faith, but how those teachings
+              can guide everyday life.
+            </p>
+
+            <p style={styles.bioCopy}>
+              Through decades of service, devotion and teaching, he has earned the
+              respect and affection of the communities he has served.
+            </p>
+
+            <p style={styles.bioCopy}>
+              A spiritual leader and purohit of the highest calibre, Pundith Shane
+              Maharaj continues a tradition handed down through generations -
+              preserving its foundations while ensuring its wisdom remains accessible
+              to generations still to come.
+            </p>
+
+            <div style={styles.heritageBlock}>
+              <img
+                src="/images/shane/shane-mandela-udw-1994.jpeg"
+                alt="Pundith Shane Maharaj officiating an opening prayer with Nelson Mandela in 1994"
+                style={styles.heritageImage}
+              />
+
+              <div style={styles.heritageText}>
+                <h3 style={styles.heritageTitle}>A Life of Service</h3>
+                <p style={styles.heritageCaption}>
+                  Pundith Shane Maharaj officiating the opening prayer with then
+                  President Nelson Mandela at the UDW Hindu Centre, 1994.
+                </p>
+              </div>
+            </div>
+
+            <p style={styles.bioClosing}>
+              This app is part of that continuing journey.
             </p>
           </div>
         </section>
@@ -289,6 +348,83 @@ const styles = {
   suggestionCard: {
     borderColor: "rgba(75,140,221,0.4)",
     background: "rgba(25,55,92,0.24)",
+  },
+
+  bioBody: {
+    width: "100%",
+  },
+
+  bioPortrait: {
+    width: "100%",
+    maxWidth: 300,
+    display: "block",
+    margin: "0 auto 18px",
+    borderRadius: 22,
+    border: "1px solid rgba(214,168,75,0.6)",
+    boxShadow: "0 10px 28px rgba(0,0,0,0.28)",
+  },
+
+  bioTitle: {
+    margin: "0 0 18px",
+    textAlign: "center",
+    color: "#f1d7a1",
+    fontSize: 24,
+    lineHeight: 1.2,
+  },
+
+  bioCopy: {
+    margin: "0 0 14px",
+    color: "#e4e4e4",
+    fontSize: 14,
+    lineHeight: 1.65,
+  },
+
+  bioHighlight: {
+    margin: "18px 0",
+    color: "#d6a84b",
+    fontSize: 15,
+    lineHeight: 1.6,
+    fontWeight: 700,
+  },
+
+  heritageBlock: {
+    marginTop: 22,
+    border: "1px solid rgba(214,168,75,0.35)",
+    borderRadius: 16,
+    overflow: "hidden",
+    background: "rgba(255,255,255,0.035)",
+  },
+
+  heritageImage: {
+    width: "100%",
+    height: "auto",
+    display: "block",
+  },
+
+  heritageText: {
+    padding: "14px 16px 16px",
+  },
+
+  heritageTitle: {
+    margin: "0 0 8px",
+    color: "#d6a84b",
+    fontSize: 18,
+  },
+
+  heritageCaption: {
+    margin: 0,
+    color: "#d8d8d8",
+    fontSize: 13,
+    lineHeight: 1.55,
+  },
+
+  bioClosing: {
+    margin: "22px 0 2px",
+    textAlign: "center",
+    color: "#f1d7a1",
+    fontSize: 16,
+    lineHeight: 1.5,
+    fontWeight: 700,
   },
 
   aboutCard: {

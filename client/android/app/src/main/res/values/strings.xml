@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Shane Prayer</string>
+    <string name="title_activity_main">Shane Prayer</string>
+    <string name="package_name">za.co.zazuaistudio.shaneprayer</string>
+    <string name="custom_url_scheme">za.co.zazuaistudio.shaneprayer</string>
+</resources>

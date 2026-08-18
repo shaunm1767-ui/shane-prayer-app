@@ -31,6 +31,8 @@ export async function buildDailyAudioQueue(day) {
     return {
       plan: null,
       queue: [],
+      coreTracks: [],
+      poolTracks: [],
       missing: [],
     };
   }
@@ -102,6 +104,8 @@ export async function buildDailyAudioQueue(day) {
   console.log("[DAILY AUDIO QUEUE]", {
     day: plan.day,
     theme: plan.theme,
+    core: coreTracks.map((track) => track.title),
+    pool: poolTracks.map((track) => track.title),
     queue: queue.map((track) => track.title),
     missing,
   });
@@ -109,6 +113,8 @@ export async function buildDailyAudioQueue(day) {
   return {
     plan,
     queue,
+    coreTracks,
+    poolTracks,
     missing,
   };
 }

@@ -1,6 +1,7 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import playlistController from "../core/playlistController";
 import { buildDailyAudioQueue } from "../data/dailyAudioQueue";
+import DailyTrackBrowser from "../components/DailyTrackBrowser";
 
 export default function PrayScreen() {
   const [loading, setLoading] = useState(false);
@@ -13,7 +14,7 @@ const day = devDay;
   const guidance = {
     0: {
       day: "Sunday",
-hindiDay: "रविवार",
+hindiDay: "??????",
       image: "/images/deities/sunday-surya.png",
       focus: "Surya – Energy & Clarity",
       mantra: "Om Suryaya Namaha",
@@ -25,7 +26,7 @@ hindiDay: "रविवार",
     },
     1: {
      day: "Monday",
-hindiDay: "सोमवार",
+hindiDay: "??????",
       image: "/images/deities/monday-shiva.png",
       focus: "Shiva – Calm & Stillness",
       mantra: "Om Namah Shivaya",
@@ -37,7 +38,7 @@ hindiDay: "सोमवार",
     },
     2: {
      day: "Tuesday",
-hindiDay: "मंगलवार",
+hindiDay: "???????",
       image: "/images/deities/tuesday-hanuman.png",
       focus: "Hanuman – Strength & Courage",
       mantra: "Om Hanumate Namaha",
@@ -49,7 +50,7 @@ hindiDay: "मंगलवार",
     },
     3: {
       day: "Wednesday",
-hindiDay: "बुधवार",
+hindiDay: "??????",
       image: "/images/deities/wednesday-ganesha.png",
       focus: "Ganesha – Wisdom & Flow",
       mantra: "Om Gan Ganapataye Namaha",
@@ -61,7 +62,7 @@ hindiDay: "बुधवार",
     },
     4: {
       day: "Thursday",
-hindiDay: "गुरुवार",
+hindiDay: "???????",
       image: "/images/deities/thursday-vishnu.png",
       focus: "Guru – Guidance & Learning",
       mantra: "Om Namo Bhagavate Vasudevaya",
@@ -73,7 +74,7 @@ hindiDay: "गुरुवार",
     },
     5: {
       day: "Friday",
-hindiDay: "शुक्रवार",
+hindiDay: "????????",
       image: "/images/deities/friday-lakshmi.png",
       focus: "Lakshmi – Abundance & Gratitude",
       mantra: "Om Shreem Mahalakshmiyei Namaha",
@@ -85,7 +86,7 @@ hindiDay: "शुक्रवार",
     },
     6: {
      day: "Saturday",
-hindiDay: "शनिवार",
+hindiDay: "??????",
       image: "/images/deities/saturday-shani-horizontal.png",
       focus: "Shani – Discipline & Karma",
       mantra: "Om Sham Shanicharaya Namaha",
@@ -163,19 +164,8 @@ hindiDay: "शनिवार",
           </div>
         )}
       </div>
+      <DailyTrackBrowser day={day} />
 
-     <div style={styles.controls}>
-  <button
-    type="button"
-    onClick={playTodayPrayer}
-    style={styles.playBtn}
-    disabled={loading}
-  >
-    {loading ? "Loading..." : "▶ Play Today's Prayer"}
-  </button>
-</div>
-
-{message && <p style={styles.status}>{message}</p>}
 
     
 
@@ -370,5 +360,7 @@ controls: {
 
 
 };
+
+
 
 

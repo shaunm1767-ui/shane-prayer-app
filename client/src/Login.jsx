@@ -1,40 +1,126 @@
 import React, { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth } from "./firebase";
 
 export default function Login() {
+  const [mode, setMode] = useState("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
-  const handleLogin = async (e) => {
+  const isCreateMode = mode === "create";
+
+  const friendlyError = (err) => {
+    switch (err?.code) {
+      case "auth/email-already-in-use":
+        return "An account already exists with this email address.";
+      case "auth/invalid-email":
+        return "Please enter a valid email address.";
+      case "auth/weak-password":
+        return "Please choose a stronger password.";
+      case "auth/user-not-found":
+        return "No account was found for this email address.";
+      case "auth/wrong-password":
+      case "auth/invalid-credential":
+        return "Incorrect email address or password.";
+      case "auth/too-many-requests":
+        return "Too many attempts. Please wait a little and try again.";
+      case "auth/network-request-failed":
+        return "Network connection problem. Please check your internet connection.";
+      default:
+        return "Something went wrong. Please check your details and try again.";
+    }
+  };
+
+  const resetMessages = () => {
+    setError("");
+    setNotice("");
+  };
+
+  const switchMode = (nextMode) => {
+    setMode(nextMode);
+    setPassword("");
+    setConfirmPassword("");
+    resetMessages();
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (loading) return;
+
+    resetMessages();
+
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail) {
+      setError("Please enter your email address.");
+      return;
+    }
+
+    if (!password) {
+      setError("Please enter your password.");
+      return;
+    }
+
+    if (isCreateMode && password !== confirmPassword) {
+      setError("The passwords do not match.");
+      return;
+    }
+
     setLoading(true);
-    setError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      if (isCreateMode) {
+        await createUserWithEmailAndPassword(auth, cleanEmail, password);
+        console.log("Account created successfully");
+      } else {
+        await signInWithEmailAndPassword(auth, cleanEmail, password);
+        console.log("Login successful");
+      }
 
-      // AuthProvider handles the authenticated app state.
-      console.log("Login successful");
+      // AuthProvider automatically moves authenticated users into AppShell.
     } catch (err) {
-      console.error(err);
+      console.error("[AUTH]", err);
+      setError(friendlyError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      let msg = "Login failed. Please check your details and try again.";
+  const handleForgotPassword = async () => {
+    if (loading) return;
 
-      if (err.code === "auth/user-not-found") msg = "User not found.";
-      if (err.code === "auth/wrong-password") msg = "Wrong password.";
-      if (err.code === "auth/invalid-credential")
-        msg = "Incorrect email address or password.";
-      if (err.code === "auth/invalid-email") msg = "Invalid email address.";
-      if (err.code === "auth/too-many-requests")
-        msg = "Too many attempts. Please try again later.";
-      if (err.code === "auth/api-key-not-valid.-please-pass-a-valid-api-key.")
-        msg = "Firebase configuration error.";
+    resetMessages();
 
-      setError(msg);
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail) {
+      setError("Enter your email address first, then tap Forgot password.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await sendPasswordResetEmail(auth, cleanEmail);
+      setNotice(
+        "Password reset email sent. Please check your inbox and spam folder."
+      );
+    } catch (err) {
+      console.error("[PASSWORD RESET]", err);
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -55,8 +141,31 @@ export default function Login() {
           PRAY TO LIVE
         </div>
 
-        <form onSubmit={handleLogin} style={styles.card}>
+        <div style={styles.modeTabs}>
+          <button
+            type="button"
+            onClick={() => switchMode("signin")}
+            style={{
+              ...styles.modeButton,
+              ...(mode === "signin" ? styles.modeButtonActive : {}),
+            }}
+          >
+            Sign In
+          </button>
 
+          <button
+            type="button"
+            onClick={() => switchMode("create")}
+            style={{
+              ...styles.modeButton,
+              ...(mode === "create" ? styles.modeButtonActive : {}),
+            }}
+          >
+            Create Account
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} style={styles.card}>
           <label style={styles.label} htmlFor="login-email">
             Email address
           </label>
@@ -66,7 +175,10 @@ export default function Login() {
             type="email"
             placeholder="Email address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              resetMessages();
+            }}
             autoComplete="email"
             style={styles.input}
             required
@@ -76,16 +188,74 @@ export default function Login() {
             Password
           </label>
 
-          <input
-            id="login-password"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            style={styles.input}
-            required
-          />
+          <div style={styles.passwordRow}>
+            <input
+              id="login-password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                resetMessages();
+              }}
+              autoComplete={isCreateMode ? "new-password" : "current-password"}
+              style={styles.passwordInput}
+              required
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((value) => !value)}
+              style={styles.showButton}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+
+          {isCreateMode && (
+            <>
+              <label style={styles.label} htmlFor="confirm-password">
+                Confirm password
+              </label>
+
+              <div style={styles.passwordRow}>
+                <input
+                  id="confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    resetMessages();
+                  }}
+                  autoComplete="new-password"
+                  style={styles.passwordInput}
+                  required
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword((value) => !value)
+                  }
+                  style={styles.showButton}
+                >
+                  {showConfirmPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </>
+          )}
+
+          {!isCreateMode && (
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={loading}
+              style={styles.forgotButton}
+            >
+              Forgot password?
+            </button>
+          )}
 
           <button
             type="submit"
@@ -96,7 +266,13 @@ export default function Login() {
               cursor: loading ? "wait" : "pointer",
             }}
           >
-            {loading ? "Entering..." : "🙏 NAMASTE"}
+            {loading
+              ? isCreateMode
+                ? "Creating account..."
+                : "Entering..."
+              : isCreateMode
+                ? "CREATE ACCOUNT"
+                : "NAMASTE"}
           </button>
 
           {error && (
@@ -104,9 +280,29 @@ export default function Login() {
               {error}
             </p>
           )}
+
+          {notice && (
+            <p role="status" style={styles.notice}>
+              {notice}
+            </p>
+          )}
+
+          <p style={styles.switchText}>
+            {isCreateMode
+              ? "Already have an account?"
+              : "New to Shane Satsang?"}
+
+            <button
+              type="button"
+              onClick={() =>
+                switchMode(isCreateMode ? "signin" : "create")
+              }
+              style={styles.switchButton}
+            >
+              {isCreateMode ? " Sign In" : " Create Account"}
+            </button>
+          </p>
         </form>
-
-
       </section>
     </main>
   );
@@ -153,11 +349,36 @@ const styles = {
     letterSpacing: 1,
   },
 
+  modeTabs: {
+    width: "100%",
+    maxWidth: 350,
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 8,
+    marginTop: 24,
+  },
+
+  modeButton: {
+    padding: "10px 8px",
+    borderRadius: 10,
+    border: "1px solid rgba(241,205,105,0.35)",
+    background: "rgba(37,12,53,0.45)",
+    color: "#D8C8DD",
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+
+  modeButtonActive: {
+    border: "1px solid #F1CD69",
+    background: "rgba(241,205,105,0.16)",
+    color: "#F1CD69",
+  },
+
   card: {
     width: "100%",
     maxWidth: 350,
     boxSizing: "border-box",
-    marginTop: 28,
+    marginTop: 12,
     padding: "14px 16px 18px",
     borderRadius: 18,
     background: "rgba(37, 12, 53, 0.42)",
@@ -165,31 +386,6 @@ const styles = {
     boxShadow: "0 12px 34px rgba(0, 0, 0, 0.24)",
     backdropFilter: "blur(10px)",
     WebkitBackdropFilter: "blur(10px)",
-  },
-
-  lotus: {
-    textAlign: "center",
-    color: "#F1CD69",
-    fontSize: 30,
-    lineHeight: 1,
-  },
-
-  title: {
-    margin: "10px 0 4px",
-    textAlign: "center",
-    color: "#F1CD69",
-    fontFamily: "Georgia, 'Times New Roman', serif",
-    fontSize: 38,
-    fontWeight: 700,
-    letterSpacing: 0.3,
-  },
-
-  subtitle: {
-    margin: "0 0 20px",
-    textAlign: "center",
-    color: "#F5EBD7",
-    fontSize: 15,
-    lineHeight: 1.45,
   },
 
   label: {
@@ -211,6 +407,45 @@ const styles = {
     color: "#ffffff",
     fontSize: 16,
     outline: "none",
+  },
+
+  passwordRow: {
+    display: "flex",
+    alignItems: "center",
+    borderBottom: "1px solid rgba(241,205,105,0.9)",
+  },
+
+  passwordInput: {
+    flex: 1,
+    minWidth: 0,
+    padding: "10px 2px 9px",
+    border: "none",
+    background: "transparent",
+    color: "#ffffff",
+    fontSize: 16,
+    outline: "none",
+  },
+
+  showButton: {
+    border: "none",
+    background: "transparent",
+    color: "#F1CD69",
+    fontSize: 12,
+    fontWeight: 800,
+    cursor: "pointer",
+    padding: "8px 2px 8px 12px",
+  },
+
+  forgotButton: {
+    display: "block",
+    margin: "12px 0 0 auto",
+    border: "none",
+    background: "transparent",
+    color: "#F1CD69",
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+    padding: 0,
   },
 
   button: {
@@ -240,37 +475,32 @@ const styles = {
     textAlign: "center",
   },
 
-  footer: {
-    width: "100%",
-    maxWidth: 430,
-    paddingTop: 22,
+  notice: {
+    margin: "14px 0 0",
+    padding: "10px 12px",
+    borderRadius: 10,
+    background: "rgba(46,125,82,0.25)",
+    border: "1px solid rgba(111,214,151,0.4)",
+    color: "#D4FFE4",
+    fontSize: 13,
+    lineHeight: 1.4,
     textAlign: "center",
   },
 
-  quote: {
+  switchText: {
+    margin: "18px 0 0",
+    textAlign: "center",
+    color: "#D8C8DD",
+    fontSize: 13,
+  },
+
+  switchButton: {
+    border: "none",
+    background: "transparent",
     color: "#F1CD69",
-    fontFamily: "Georgia, 'Times New Roman', serif",
-    fontSize: 25,
-    fontWeight: 700,
-    lineHeight: 1.15,
-    letterSpacing: 1,
-  },
-
-  author: {
-    marginTop: 10,
-    color: "#E0B951",
-    fontFamily: "Georgia, 'Times New Roman', serif",
-    fontSize: 16,
-    fontStyle: "italic",
-  },
-
-  version: {
-    marginTop: 18,
-    color: "#CBBFD1",
-    fontSize: 12,
+    fontSize: 13,
+    fontWeight: 800,
+    cursor: "pointer",
+    padding: 0,
   },
 };
-
-
-
-
